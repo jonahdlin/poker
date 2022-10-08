@@ -1,0 +1,42 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "poker server",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "ts-node -r tsconfig-paths/register src\\index.ts",
+    "export-types": "copy src\\types.ts ..\\client\\src\\schema\\",
+    "et": "npm run export-types"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.20.0",
+    "cookie-parser": "^1.4.6",
+    "express": "^4.18.1",
+    "express-session": "^1.17.3",
+    "lodash": "^4.17.21",
+    "unique-names-generator": "^4.7.1",
+    "uuid": "^9.0.0",
+    "ws": "^8.9.0"
+  },
+  "devDependencies": {
+    "@types/body-parser": "^1.19.2",
+    "@types/cookie-parser": "^1.4.3",
+    "@types/express": "^4.17.14",
+    "@types/express-session": "^1.17.5",
+    "@types/lodash": "^4.14.186",
+    "@types/node": "^18.7.23",
+    "@types/uuid": "^8.3.4",
+    "@types/ws": "^8.5.3",
+    "prettier": "2.7.1",
+    "ts-node": "^10.9.1",
+    "tsconfig-paths": "^4.1.0",
+    "typescript": "^4.8.4"
+  },
+  "engines": {
+    "node": "16.16.0"
+  }
+}
