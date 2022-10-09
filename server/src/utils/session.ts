@@ -15,6 +15,7 @@ import {
   isBettingCall,
   isBettingFold,
   isBettingRaise,
+  Round,
   Suit,
   TablePosition,
 } from "src/types";
@@ -22,6 +23,7 @@ import shuffle from "lodash/shuffle";
 import { Player, RoundWithHiddenInfo, Session } from "src/db/schema";
 import sortBy from "lodash/sortBy";
 import isInteger from "lodash/isInteger";
+import { max } from "lodash";
 
 export const DeleteRoomAfterInactivityTimeout = 1000 * 60 * 60 * 24 * 7;
 
@@ -173,7 +175,6 @@ export const startRound = ({
       startingPlayerId: bigBlindPlayer.publicId,
       lastRaise: bigBlind, // set to big blind regardless of whether the BB was actually paid
       lastRaiserPlayerId: bigBlindPlayer.publicId,
-      potThisRound: 0,
       betsThisRound: new Map(
         sortedPlayers.map(({ publicId }) => {
           const bet = (() => {
@@ -193,6 +194,13 @@ export const startRound = ({
   };
 };
 
+const getHighestBet = (bettingRound: Round["bettingRound"]): number => {
+  return bettingRound == "SHOWING_SUMMARY"
+    ? 0
+    : max(Array.from(bettingRound.betsThisRound.values()).map((n) => n ?? 0)) ??
+        0;
+};
+
 // mutates session
 export const handleGameInput = ({
   session,
@@ -205,6 +213,7 @@ export const handleGameInput = ({
   readonly secretPlayerId: string; // of player who did the input
   readonly input: BettingCall | BettingRaise | BettingBet | BettingFold;
 }) => {
+  console.log(session.round);
   if (
     session.round == null ||
     session.round.currentTurnPlayerId != publicPlayerId ||
@@ -231,6 +240,8 @@ export const handleGameInput = ({
     currentPlayerInRoundIndex == -1
       ? undefined
       : sortedPlayersInRound[currentPlayerInRoundIndex];
+
+  console.log(currentPlayerInRound, sortedPlayersInRound);
 
   if (
     currentPlayerInRound == null ||
@@ -298,7 +309,6 @@ export const handleGameInput = ({
       );
       round.bettingRound = {
         startingPlayerId: starter.publicId,
-        potThisRound: 0,
         betsThisRound: new Map(
           unfoldedSeatedPlayers.map(({ publicId }) => [publicId, null])
         ),
@@ -341,28 +351,52 @@ export const handleGameInput = ({
       (newSortedPlayersInRound[0].chips ?? 0) + round.pot;
   };
 
+  const advanceTurnOrRoundIfDone = () => {
+    const newSortedPlayersInRound = sortPlayersBySeat(session.players).filter(
+      ({ publicId }) => !round.foldedPlayers.includes(publicId)
+    );
+
+    // Someone won because everyone folded
+    if (newSortedPlayersInRound.length == 1) {
+      beginNextPhase();
+    }
+
+    if (
+      (bettingRound.lastRaiserPlayerId != null &&
+        nextPlayer.publicId == bettingRound.lastRaiserPlayerId) ||
+      (bettingRound.lastRaiserPlayerId == null &&
+        nextPlayer.publicId == bettingRound.startingPlayerId)
+    ) {
+      // made it around the circle. If it's the first betting round, the big blind
+      // player gets another chance to raise
+      const highestBet = getHighestBet(bettingRound);
+      if (
+        round.flop == null &&
+        highestBet == bigBlind &&
+        nextPlayer.publicId == bettingRound.startingPlayerId
+      ) {
+        round.currentTurnPlayerId = nextPlayer.publicId;
+      } else {
+        beginNextPhase();
+      }
+    } else {
+      round.currentTurnPlayerId = nextPlayer.publicId;
+    }
+  };
+
   if (isBettingFold(input)) {
     round.foldedPlayers.push(publicPlayerId);
     const newSortedPlayersInRound = sortPlayersBySeat(session.players).filter(
       ({ publicId }) => !round.foldedPlayers.includes(publicId)
     );
-    if (
-      (bettingRound.lastRaiserPlayerId != null &&
-        nextPlayer.publicId == bettingRound.lastRaiserPlayerId) ||
-      (bettingRound.lastRaiserPlayerId == null &&
-        nextPlayer.publicId == bettingRound.startingPlayerId) ||
-      newSortedPlayersInRound.length == 1
-    ) {
-      beginNextPhase();
-    } else {
-      round.currentTurnPlayerId = nextPlayer.publicId;
-    }
+    advanceTurnOrRoundIfDone();
     return;
   }
 
   if (isBettingCall(input)) {
+    const highestBet = getHighestBet(bettingRound);
     // cannot call if no bet has been made
-    if (bettingRound.currentBet == null || bettingRound.currentBet == 0) {
+    if (highestBet == 0) {
       return;
     }
 
@@ -383,7 +417,7 @@ export const handleGameInput = ({
       return;
     }
 
-    const targetAmount = bettingRound.currentBet;
+    const targetAmount = highestBet - (betThisRound ?? 0);
     const realAmount = Math.min(targetAmount, currentPlayerInRound.chips);
 
     bettingRound.betsThisRound.set(
@@ -393,11 +427,7 @@ export const handleGameInput = ({
     currentPlayerInRound.chips -= realAmount;
     round.pot += realAmount;
 
-    if (nextPlayer.publicId == bettingRound.lastRaiserPlayerId) {
-      beginNextPhase();
-    } else {
-      round.currentTurnPlayerId = nextPlayer.publicId;
-    }
+    advanceTurnOrRoundIfDone();
     return;
   }
 
@@ -407,9 +437,11 @@ export const handleGameInput = ({
       return;
     }
 
+    const highestBet = getHighestBet(bettingRound);
+
     // cannot check (bet of 0) or bet if there has already been a nonzero bet,
     // in that case you can only call or raise
-    if (bettingRound.currentBet != null && bettingRound.currentBet > 0) {
+    if (highestBet > 0) {
       return;
     }
 
@@ -432,13 +464,7 @@ export const handleGameInput = ({
 
     // checking case
     if (input.amount == 0) {
-      // checks all around
-      if (nextPlayer.publicId == bettingRound.startingPlayerId) {
-        beginNextPhase();
-        return;
-      }
-
-      round.currentTurnPlayerId = nextPlayer.publicId;
+      advanceTurnOrRoundIfDone();
       return;
     }
 
@@ -466,13 +492,11 @@ export const handleGameInput = ({
       return;
     }
 
+    const highestBet = getHighestBet(bettingRound);
+
     // cannot raise if a bet has not been placed
     // in that case you can only check or bet
-    if (
-      bettingRound.currentBet == null ||
-      bettingRound.currentBet == 0 ||
-      bettingRound.lastRaise == null
-    ) {
+    if (highestBet == 0 || bettingRound.lastRaise == null) {
       return;
     }
 

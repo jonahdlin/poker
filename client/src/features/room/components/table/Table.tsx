@@ -25,9 +25,10 @@ const Table: React.FC<TableProps> = ({ style, gameStore }) => {
         pot={round?.pot}
         toBeAddedToPot={
           round?.bettingRound == null ||
-          round?.bettingRound === "SHOWING_SUMMARY"
+          round?.bettingRound === "SHOWING_SUMMARY" ||
+          round.potThisRound === 0
             ? undefined
-            : round.bettingRound.potThisRound
+            : round.potThisRound
         }
       />
       <SeatGrid style={styles.seats} gameStore={gameStore} />

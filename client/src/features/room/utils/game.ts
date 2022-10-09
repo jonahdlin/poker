@@ -46,7 +46,9 @@ export type GameStore = {
   readonly textMessageHistory: ReadonlyArray<TextMessageHistoryEntry>;
 
   readonly isGameStarted: boolean;
-  readonly round?: Round;
+  readonly round?: Round & {
+    readonly potThisRound: number;
+  };
 
   readonly getPlayerByPublicId: (
     playerPublicId: string
@@ -60,6 +62,10 @@ export type GameStore = {
   readonly onLeave: () => unknown;
   readonly onSendTextMessage: (message: string) => unknown;
   readonly onStartGame: () => unknown;
+  readonly onBettingCall: () => unknown;
+  readonly onBettingFold: () => unknown;
+  readonly onBettingRaise: (amount: number) => unknown;
+  readonly onBettingBet: (amount: number) => unknown;
 };
 
 export const AllSeats: ReadonlyArray<TablePosition> = [
@@ -110,9 +116,11 @@ export const useGame = ({
       `ws://localhost:${port}/socket?secretId=${secretPlayerId}`
     );
     newSocket.onclose = () => {
+      console.log("closed socket");
       setDisconnected(true);
     };
     newSocket.onerror = () => {
+      console.log("error socket");
       setDisconnected(true);
     };
     newSocket.onmessage = ({ data }: { data: string }) =>
@@ -171,6 +179,34 @@ export const useGame = ({
     });
   };
 
+  const onBettingCall = () => {
+    send({
+      isTypeBettingCall: true,
+    });
+  };
+
+  const onBettingFold = () => {
+    send({
+      isTypeBettingFold: true,
+    });
+  };
+
+  const onBettingRaise = (amount: number) => {
+    send({
+      isTypeBettingRaise: true,
+
+      amount,
+    });
+  };
+
+  const onBettingBet = (amount: number) => {
+    send({
+      isTypeBettingBet: true,
+
+      amount,
+    });
+  };
+
   const takenSeats = (localState?.players ?? []).map(
     ({ tablePosition }) => tablePosition
   );
@@ -199,6 +235,19 @@ export const useGame = ({
     statePlayerToGenericPlayer
   );
 
+  const computePotThisRound = () => {
+    if (
+      localState?.round?.bettingRound == null ||
+      localState.round.bettingRound === "SHOWING_SUMMARY"
+    ) {
+      return 0;
+    }
+
+    return Array.from(
+      localState.round.bettingRound.betsThisRound.values()
+    ).reduce<number>((acc, amt) => acc + (amt ?? 0), 0);
+  };
+
   return {
     isConnected: socket != null && !disconnected,
     isLoading: socket == null && !disconnected,
@@ -219,7 +268,13 @@ export const useGame = ({
           },
     availableSeats: AllSeats.filter((seat) => !takenSeats.includes(seat)),
     isGameStarted: localState?.gameStarted ?? false,
-    round: localState?.round,
+    round:
+      localState?.round == null
+        ? undefined
+        : {
+            ...localState.round,
+            potThisRound: computePotThisRound(),
+          },
 
     maxTextMessageLength: localState?.maxTextMessageLength ?? 500,
     maxNameLength: localState?.maxNameLength ?? 50,
@@ -236,5 +291,10 @@ export const useGame = ({
     onLeave,
     onSendTextMessage,
     onStartGame,
+
+    onBettingCall,
+    onBettingFold,
+    onBettingRaise,
+    onBettingBet,
   };
 };

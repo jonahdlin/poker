@@ -245,11 +245,6 @@ export type Round = {
         readonly lastRaise?: number; // kept track of for minimum raises on top of current bet
         readonly lastRaiserPlayerId?: string; // public player ID
         readonly startingPlayerId: string; // public player ID, the person who had the first turn in this round of betting
-        readonly currentBet?: number; // what must be called to stay in
-        // what will be added to the pot from this betting round
-        // note bets are added to round.pot right away, this field is only to keep
-        // track for display purposes
-        readonly potThisRound: number;
         // what each player who had not folded at the beginning of this betting round
         // has bet so far this round
         readonly betsThisRound: Map<

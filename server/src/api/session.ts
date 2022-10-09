@@ -94,7 +94,21 @@ export const createRoomWs = (app: Express, port: number) => {
       ),
       textMessageHistory,
       bigBlind,
-      round,
+      round:
+        round == null
+          ? undefined
+          : {
+              roundEnded: round.roundEnded,
+              winner: round.winner,
+              flop: round.flop,
+              turn: round.turn,
+              river: round.river,
+              pot: round.pot,
+              foldedPlayers: round.foldedPlayers,
+              dealerPlayerId: round.dealerPlayerId,
+              currentTurnPlayerId: round.currentTurnPlayerId,
+              bettingRound: round.bettingRound,
+            },
     };
   };
 

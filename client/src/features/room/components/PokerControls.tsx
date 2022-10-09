@@ -12,7 +12,7 @@ type PokerControlsProps = DefaultProps & {
 const PokerControls: React.FC<PokerControlsProps> = ({ style, gameStore }) => {
   const styles = useStyleSheet();
 
-  const { me, players, onStartGame } = gameStore;
+  const { me, players, onStartGame, onBettingCall, onBettingFold } = gameStore;
 
   const enoughPlayers =
     players.filter(({ tablePosition }) => tablePosition != null).length >= 2;
@@ -39,19 +39,28 @@ const PokerControls: React.FC<PokerControlsProps> = ({ style, gameStore }) => {
           </Button>
         </Tooltip2>
       )}
-      {/* {gameStore.isGameStarted && ( */}
-      <>
-        <Button outlined className={css(styles.actionButton)}>
-          Raise
-        </Button>
-        <Button outlined className={css(styles.actionButton)}>
-          Call
-        </Button>
-        <Button outlined className={css(styles.actionButton)} intent="warning">
-          Fold
-        </Button>
-      </>
-      {/* )} */}
+      {gameStore.isGameStarted && (
+        <>
+          <Button outlined className={css(styles.actionButton)}>
+            Raise
+          </Button>
+          <Button
+            outlined
+            className={css(styles.actionButton)}
+            onClick={() => onBettingCall()}
+          >
+            Call
+          </Button>
+          <Button
+            outlined
+            className={css(styles.actionButton)}
+            intent="warning"
+            onClick={() => onBettingFold()}
+          >
+            Fold
+          </Button>
+        </>
+      )}
     </div>
   );
 };
