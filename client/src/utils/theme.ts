@@ -8,6 +8,7 @@ export type ThemeType = {
   readonly dangerLight: string;
 
   readonly backgroundWhite: string;
+  readonly backgroundLight: string;
 
   readonly fontColorLight: string;
 };
@@ -20,6 +21,7 @@ export const Theme: ThemeType = {
   dangerLight: Colors.RED3,
 
   backgroundWhite: Colors.WHITE,
+  backgroundLight: Colors.LIGHT_GRAY4,
 
   fontColorLight: Colors.GRAY1,
 };

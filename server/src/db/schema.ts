@@ -5,6 +5,7 @@ import {
   TablePosition,
   TextMessageHistoryEntry,
 } from "src/types";
+import { Writeable } from "src/utils/types";
 
 export type Player = {
   // secret, used to identify player when they connect or make a request
@@ -23,7 +24,9 @@ export type Player = {
   hand?: Hand;
 };
 
-export type RoundWithHiddenInfo = Round & {
+export type RoundWithHiddenInfo = Writeable<Omit<Round, "bettingRound">> & {
+  bettingRound: Writeable<Round["bettingRound"]>;
+} & {
   deck: Array<Card>;
   hands: Map<
     string, // secret player ID

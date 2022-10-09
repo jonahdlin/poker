@@ -1,10 +1,10 @@
 import { css, StyleSheet } from "aphrodite";
 import Messaging from "features/room/components/Messaging";
 import PokerControls from "features/room/components/PokerControls";
-import PokerTable from "features/room/components/PokerTable";
 import { useGame } from "features/room/utils/game";
 import { useMemo } from "react";
 import { DefaultProps } from "utils/styles";
+import Table from "./table/Table";
 
 type RoomPageProps = DefaultProps & {
   readonly port: number;
@@ -29,7 +29,7 @@ const RoomPage: React.FC<RoomPageProps> = ({
   return (
     <div className={css(styles.root, style)}>
       <div className={css(styles.mainContent)}>
-        <PokerTable gameStore={gameStore} />
+        <Table gameStore={gameStore} />
       </div>
       <div className={css(styles.footer)}>
         <Messaging gameStore={gameStore} />

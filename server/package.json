@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "ts-node -r tsconfig-paths/register src\\index.ts",
+    "start": "npx ts-node -r tsconfig-paths/register src\\index.ts",
     "export-types": "copy src\\types.ts ..\\client\\src\\schema\\",
     "et": "npm run export-types"
   },

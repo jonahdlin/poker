@@ -13,11 +13,15 @@
 - Set up DB
 - Deploying
 - Git repo
+- Remove different ports, host all on same server [docs](https://github.com/websockets/ws#multiple-servers-sharing-a-single-https-server)
 
 #### Game
 
-- Rounds
+- ~~Rounds~~
 - Calling/betting/checking/folding
+- Clientside indicators
+  - How much bet this betting round
+  - How much in pot this betting round
 - Winning logic
 - Multiple winners/side pots
 - Game effects of disconnecting while at the table

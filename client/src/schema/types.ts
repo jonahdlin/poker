@@ -222,26 +222,41 @@ export type Round = {
   // If this round object still exists and roundEnded is true, then there is likely
   // a timer set on the BE to delete the round object. This time is for players to
   // review the results of the round before the next one starts
-  roundEnded: boolean;
-  winner?: string; // public player ID
+  readonly roundEnded: boolean;
+  readonly winner?: string; // public player ID
 
   // cards
-  deck: Array<Card>; // cards yet to be dealt or revealed
-  flop?: [Card, Card, Card];
-  turn?: Card;
-  river?: Card;
+  readonly flop?: readonly [Card, Card, Card];
+  readonly turn?: Card;
+  readonly river?: Card;
 
   // chip/betting info
-  pot: number;
-  lastRaise?: number; // kept track of for minimum bets
-  lastRaiserPlayerId?: string; // public player ID
-  currentTrickStartingPlayerId: string; // public player ID, the person who had the first turn in this round of betting
-  currentBet?: number;
-  foldedPlayers: Array<string>; // public player ID
+  readonly pot: number;
+  readonly foldedPlayers: Array<string>; // public player ID
 
   // player positions
-  dealerPlayerId: string; // public player ID
-  currentTurnPlayerId?: string; // public player ID
+  readonly dealerPlayerId: string; // public player ID
+  readonly currentTurnPlayerId?: string; // public player ID
+
+  // current betting round info
+  readonly bettingRound:
+    | "SHOWING_SUMMARY"
+    | {
+        readonly lastRaise?: number; // kept track of for minimum raises on top of current bet
+        readonly lastRaiserPlayerId?: string; // public player ID
+        readonly startingPlayerId: string; // public player ID, the person who had the first turn in this round of betting
+        readonly currentBet?: number; // what must be called to stay in
+        // what will be added to the pot from this betting round
+        // note bets are added to round.pot right away, this field is only to keep
+        // track for display purposes
+        readonly potThisRound: number;
+        // what each player who had not folded at the beginning of this betting round
+        // has bet so far this round
+        readonly betsThisRound: Map<
+          string, // public player ID
+          number | null
+        >;
+      };
 };
 
 export type GameState = {
