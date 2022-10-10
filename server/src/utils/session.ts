@@ -10,6 +10,7 @@ import {
   BettingCall,
   BettingFold,
   BettingRaise,
+  BettingRoundData,
   Card,
   isBettingBet,
   isBettingCall,
@@ -175,8 +176,8 @@ export const startRound = ({
       startingPlayerId: bigBlindPlayer.publicId,
       lastRaise: bigBlind, // set to big blind regardless of whether the BB was actually paid
       lastRaiserPlayerId: bigBlindPlayer.publicId,
-      betsThisRound: new Map(
-        sortedPlayers.map(({ publicId }) => {
+      betsThisRound: sortedPlayers.reduce<BettingRoundData["betsThisRound"]>(
+        (acc, { publicId }) => {
           const bet = (() => {
             if (publicId == bigBlindPlayer.publicId) {
               return bigBlindRealAmount;
@@ -187,8 +188,12 @@ export const startRound = ({
 
             return null;
           })();
-          return [publicId, bet];
-        })
+
+          acc[publicId] = bet;
+
+          return acc;
+        },
+        {}
       ),
     },
   };
@@ -197,8 +202,7 @@ export const startRound = ({
 const getHighestBet = (bettingRound: Round["bettingRound"]): number => {
   return bettingRound == "SHOWING_SUMMARY"
     ? 0
-    : max(Array.from(bettingRound.betsThisRound.values()).map((n) => n ?? 0)) ??
-        0;
+    : max(Object.values(bettingRound.betsThisRound).map((n) => n ?? 0)) ?? 0;
 };
 
 // mutates session
@@ -309,8 +313,14 @@ export const handleGameInput = ({
       );
       round.bettingRound = {
         startingPlayerId: starter.publicId,
-        betsThisRound: new Map(
-          unfoldedSeatedPlayers.map(({ publicId }) => [publicId, null])
+        betsThisRound: unfoldedSeatedPlayers.reduce<
+          BettingRoundData["betsThisRound"]
+        >(
+          (acc, { publicId }) => ({
+            ...acc,
+            [publicId]: null,
+          }),
+          {}
         ),
       };
       round.currentTurnPlayerId = starter.publicId;
@@ -405,9 +415,8 @@ export const handleGameInput = ({
       return;
     }
 
-    const betThisRound = bettingRound.betsThisRound.get(
-      currentPlayerInRound.publicId
-    );
+    const betThisRound =
+      bettingRound.betsThisRound[currentPlayerInRound.publicId];
 
     // not existing in bettingRound.betsThisRound means the game things you've
     // folded before this betting round
@@ -420,10 +429,8 @@ export const handleGameInput = ({
     const targetAmount = highestBet - (betThisRound ?? 0);
     const realAmount = Math.min(targetAmount, currentPlayerInRound.chips);
 
-    bettingRound.betsThisRound.set(
-      currentPlayerInRound.publicId,
-      (betThisRound ?? 0) + realAmount
-    );
+    bettingRound.betsThisRound[currentPlayerInRound.publicId] =
+      (betThisRound ?? 0) + realAmount;
     currentPlayerInRound.chips -= realAmount;
     round.pot += realAmount;
 
@@ -450,9 +457,8 @@ export const handleGameInput = ({
       return;
     }
 
-    const betThisRound = bettingRound.betsThisRound.get(
-      currentPlayerInRound.publicId
-    );
+    const betThisRound =
+      bettingRound.betsThisRound[currentPlayerInRound.publicId];
 
     // not existing in bettingRound.betsThisRound means the game things you've
     // folded before this betting round
@@ -475,10 +481,8 @@ export const handleGameInput = ({
 
     currentPlayerInRound.chips -= input.amount;
     round.pot += input.amount;
-    bettingRound.betsThisRound.set(
-      currentPlayerInRound.publicId,
-      (betThisRound ?? 0) + input.amount
-    );
+    bettingRound.betsThisRound[currentPlayerInRound.publicId] =
+      (betThisRound ?? 0) + input.amount;
     bettingRound.lastRaise = input.amount;
     bettingRound.lastRaiserPlayerId = publicPlayerId;
     round.currentTurnPlayerId = nextPlayer.publicId;
@@ -513,9 +517,8 @@ export const handleGameInput = ({
       return;
     }
 
-    const betThisRound = bettingRound.betsThisRound.get(
-      currentPlayerInRound.publicId
-    );
+    const betThisRound =
+      bettingRound.betsThisRound[currentPlayerInRound.publicId];
 
     // not existing in bettingRound.betsThisRound means the game things you've
     // folded before this betting round
@@ -527,10 +530,8 @@ export const handleGameInput = ({
 
     currentPlayerInRound.chips -= input.amount;
     round.pot += input.amount;
-    bettingRound.betsThisRound.set(
-      currentPlayerInRound.publicId,
-      (betThisRound ?? 0) + input.amount
-    );
+    bettingRound.betsThisRound[currentPlayerInRound.publicId] =
+      (betThisRound ?? 0) + input.amount;
     bettingRound.lastRaise = input.amount;
     bettingRound.lastRaiserPlayerId = publicPlayerId;
     round.currentTurnPlayerId = nextPlayer.publicId;

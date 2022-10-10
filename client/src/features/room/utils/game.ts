@@ -243,8 +243,8 @@ export const useGame = ({
       return 0;
     }
 
-    return Array.from(
-      localState.round.bettingRound.betsThisRound.values()
+    return Object.values(
+      localState.round.bettingRound.betsThisRound
     ).reduce<number>((acc, amt) => acc + (amt ?? 0), 0);
   };
 

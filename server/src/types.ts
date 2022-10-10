@@ -217,6 +217,18 @@ export type TextMessageHistoryEntry = {
   readonly time: number;
 };
 
+export type BettingRoundData = {
+  readonly lastRaise?: number; // kept track of for minimum raises on top of current bet
+  readonly lastRaiserPlayerId?: string; // public player ID
+  readonly startingPlayerId: string; // public player ID, the person who had the first turn in this round of betting
+  // what each player who had not folded at the beginning of this betting round
+  // has bet so far this round
+  readonly betsThisRound: Record<
+    string, // player public ID
+    number | null
+  >;
+};
+
 export type Round = {
   // set to false initially and then true when the round is over
   // If this round object still exists and roundEnded is true, then there is likely
@@ -239,19 +251,7 @@ export type Round = {
   readonly currentTurnPlayerId?: string; // public player ID
 
   // current betting round info
-  readonly bettingRound:
-    | "SHOWING_SUMMARY"
-    | {
-        readonly lastRaise?: number; // kept track of for minimum raises on top of current bet
-        readonly lastRaiserPlayerId?: string; // public player ID
-        readonly startingPlayerId: string; // public player ID, the person who had the first turn in this round of betting
-        // what each player who had not folded at the beginning of this betting round
-        // has bet so far this round
-        readonly betsThisRound: Map<
-          string, // public player ID
-          number | null
-        >;
-      };
+  readonly bettingRound: "SHOWING_SUMMARY" | BettingRoundData;
 };
 
 export type GameState = {
