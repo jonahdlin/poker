@@ -29,7 +29,7 @@ const RoomPage: React.FC<RoomPageProps> = ({
   return (
     <div className={css(styles.root, style)}>
       <div className={css(styles.mainContent)}>
-        <Table gameStore={gameStore} />
+        <Table style={styles.table} gameStore={gameStore} />
       </div>
       <div className={css(styles.footer)}>
         <Messaging gameStore={gameStore} />
@@ -57,6 +57,15 @@ const useStyleSheet = () => {
           justifyContent: "center",
           alignItems: "center",
           flex: 1,
+          padding: 48,
+        },
+        table: {
+          maxHeight: 1000,
+          height: "100%",
+          minHeight: 400,
+          maxWidth: 1500,
+          width: "100%",
+          minWidth: 1050,
         },
         footer: {
           display: "flex",

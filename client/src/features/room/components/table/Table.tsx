@@ -42,11 +42,6 @@ const useStyleSheet = () => {
       StyleSheet.create({
         root: {
           position: "relative",
-          maxWidth: "min(60%, 1400px)",
-          minHeight: 550,
-          maxHeight: 550,
-          minWidth: 1000,
-          flex: 1,
         },
         tableSurface: {
           position: "absolute",
@@ -63,6 +58,14 @@ const useStyleSheet = () => {
           left: 0,
           height: "100%",
           width: "100%",
+        },
+        bets: {
+          position: "absolute",
+          zIndex: 3,
+          top: "15%",
+          left: "15%",
+          height: "70%",
+          width: "70%",
         },
       }),
     []

@@ -1,7 +1,7 @@
-import { Button, Card, Tag, H6 } from "@blueprintjs/core";
+import { Button, Card, Tag, H6, H4 } from "@blueprintjs/core";
 import { Popover2, Tooltip2 } from "@blueprintjs/popover2";
 import { css, StyleSheet } from "aphrodite";
-import ChooseSeatForm from "features/room/components/ChooseSeatForm";
+import ChooseSeatForm from "features/room/components/table/ChooseSeatForm";
 import Hand from "features/room/components/Hand";
 import { AllSeats, GameStore } from "features/room/utils/game";
 import numeral from "numeral";
@@ -88,17 +88,64 @@ const TablePositionToGridPosition: {
   },
 };
 
+const CHIPS_THIS_BETTING_ROUND_TAG_HEIGHT = 53;
+const CHIPS_THIS_ROUND_MARGIN = 8;
+
+const TablePositionToChipBetPosition: {
+  readonly [T in TablePosition]: Pick<
+    CSSProperties,
+    "top" | "bottom" | "left" | "right"
+  >;
+} = {
+  ONE: {
+    bottom: -CHIPS_THIS_BETTING_ROUND_TAG_HEIGHT - CHIPS_THIS_ROUND_MARGIN,
+    right: -50,
+  },
+  TWO: {
+    bottom: -CHIPS_THIS_BETTING_ROUND_TAG_HEIGHT - CHIPS_THIS_ROUND_MARGIN,
+    left: -50,
+  },
+  THREE: {
+    top: `calc(50% - ${CHIPS_THIS_BETTING_ROUND_TAG_HEIGHT / 2}px)`,
+    left: -163 - CHIPS_THIS_ROUND_MARGIN,
+  },
+  FOUR: {
+    top: `calc(50% - ${CHIPS_THIS_BETTING_ROUND_TAG_HEIGHT / 2}px)`,
+    left: -163 - CHIPS_THIS_ROUND_MARGIN,
+  },
+  FIVE: {
+    top: -CHIPS_THIS_BETTING_ROUND_TAG_HEIGHT - CHIPS_THIS_ROUND_MARGIN,
+    left: -50,
+  },
+  SIX: {
+    top: -CHIPS_THIS_BETTING_ROUND_TAG_HEIGHT - CHIPS_THIS_ROUND_MARGIN,
+    left: 70,
+  },
+  SEVEN: {
+    top: -CHIPS_THIS_BETTING_ROUND_TAG_HEIGHT - CHIPS_THIS_ROUND_MARGIN,
+    right: -50,
+  },
+  EIGHT: {
+    top: `calc(50% - ${CHIPS_THIS_BETTING_ROUND_TAG_HEIGHT / 2}px)`,
+    right: -163 - CHIPS_THIS_ROUND_MARGIN,
+  },
+  NINE: {
+    top: `calc(50% - ${CHIPS_THIS_BETTING_ROUND_TAG_HEIGHT / 2}px)`,
+    right: -163 - CHIPS_THIS_ROUND_MARGIN,
+  },
+};
+
 type HandPosition = "LEFT" | "RIGHT";
 const TablePositionToHandPosition: {
   readonly [T in TablePosition]: HandPosition;
 } = {
-  ONE: "LEFT",
+  ONE: "RIGHT",
   TWO: "RIGHT",
   THREE: "LEFT",
   FOUR: "LEFT",
   FIVE: "RIGHT",
-  SIX: "LEFT",
-  SEVEN: "LEFT",
+  SIX: "RIGHT",
+  SEVEN: "RIGHT",
   EIGHT: "RIGHT",
   NINE: "RIGHT",
 };
@@ -125,7 +172,7 @@ const SeatGrid: React.FC<SeatGridProps> = ({ style, gameStore }) => {
   }
 
   return (
-    <div className={css(styles.seats, style)}>
+    <div className={css(styles.root, style)}>
       {AllSeats.map((seat) => {
         const sittingPlayer = players.find(
           ({ tablePosition }) => tablePosition === seat
@@ -189,6 +236,10 @@ const SeatGrid: React.FC<SeatGridProps> = ({ style, gameStore }) => {
         const isMe = me != null && sittingPlayer.publicId === me?.publicId;
 
         const chips = sittingPlayer.chips ?? 0;
+        const chipsBetThisBettingRound = 9999;
+        // round == null || round.bettingRound === "SHOWING_SUMMARY"
+        //   ? undefined
+        //   : round.bettingRound.betsThisRound[sittingPlayer.publicId];
 
         return (
           <Card
@@ -200,6 +251,11 @@ const SeatGrid: React.FC<SeatGridProps> = ({ style, gameStore }) => {
                 TablePositionToHandPosition[seat] === "LEFT"
                   ? "flex-end"
                   : "flex-start",
+              ...(round?.currentTurnPlayerId === sittingPlayer.publicId
+                ? {
+                    outline: `2px solid ${Theme.outline}`,
+                  }
+                : {}),
             }}
             elevation={
               round?.currentTurnPlayerId === sittingPlayer.publicId
@@ -219,6 +275,26 @@ const SeatGrid: React.FC<SeatGridProps> = ({ style, gameStore }) => {
                 card2={isMe ? me.hand?.card2 ?? null : null}
                 cardWidth={95}
               />
+            )}
+            {chipsBetThisBettingRound != null && (
+              <div
+                className={css(styles.chipTagContainer)}
+                style={TablePositionToChipBetPosition[seat]}
+              >
+                <Tooltip2
+                  disabled={chipsBetThisBettingRound < 10000}
+                  content={numeral(chipsBetThisBettingRound).format("0,0")}
+                  placement="top"
+                >
+                  <Tag className={css(styles.chipTag)} large minimal round>
+                    <H4 className={css(styles.chipText)}>
+                      {chipsBetThisBettingRound < 10000
+                        ? numeral(chipsBetThisBettingRound).format("0,0")
+                        : numeral(chipsBetThisBettingRound).format("0,0a")}
+                    </H4>
+                  </Tag>
+                </Tooltip2>
+              </div>
             )}
             <div
               className={css(styles.innerSeatContent)}
@@ -261,7 +337,7 @@ const useStyleSheet = () => {
   return useMemo(
     () =>
       StyleSheet.create({
-        seats: {
+        root: {
           display: "grid",
           gridTemplateColumns: "1fr 1fr 104px 1fr 104px 1fr 1fr",
           gridTemplateRows: "1fr 1fr 1fr 1fr",
@@ -290,6 +366,7 @@ const useStyleSheet = () => {
           "-webkit-box-orient": "vertical",
         },
         seat: {
+          position: "relative",
           width: 150,
           height: 90,
         },
@@ -300,7 +377,7 @@ const useStyleSheet = () => {
         innerSeatContent: {
           display: "flex",
           flexDirection: "column",
-          width: 106,
+          width: 100,
           margin: 11,
           flex: 1,
           gap: 2,
@@ -314,6 +391,16 @@ const useStyleSheet = () => {
         },
         rightHand: {
           right: -100,
+        },
+        chipTagContainer: {
+          position: "absolute",
+        },
+        chipTag: {
+          backgroundColor: Theme.backgroundLight,
+          height: CHIPS_THIS_BETTING_ROUND_TAG_HEIGHT,
+        },
+        chipText: {
+          margin: 0,
         },
       }),
     []

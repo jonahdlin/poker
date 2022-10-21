@@ -8,6 +8,7 @@ import {
 } from "@blueprintjs/core";
 import { Tooltip2 } from "@blueprintjs/popover2";
 import { css, StyleSheet } from "aphrodite";
+import numeral from "numeral";
 import { useMemo, useState } from "react";
 import { DefaultProps } from "utils/styles";
 import { Theme } from "utils/theme";
@@ -27,6 +28,8 @@ type ChooseSeatFormProps = DefaultProps & {
   }) => unknown;
 };
 
+const DEFAULT_CHIPS = 1000;
+
 const ChooseSeatForm: React.FC<ChooseSeatFormProps> = ({
   style,
   minNameLength,
@@ -41,7 +44,7 @@ const ChooseSeatForm: React.FC<ChooseSeatFormProps> = ({
 }) => {
   const styles = useStyleSheet();
   const [nameValue, setNameValue] = useState<string>(currentName ?? "");
-  const [chipValue, setChipValue] = useState<number>();
+  const [chipValue, setChipValue] = useState<number>(DEFAULT_CHIPS);
 
   const [showValidation, setShowValidation] = useState(false);
 
@@ -111,7 +114,9 @@ const ChooseSeatForm: React.FC<ChooseSeatFormProps> = ({
         intent={showValidation && !nameValueValid ? "danger" : undefined}
         helperText={
           showValidation && !nameValueValid
-            ? `Must be between ${minNameLength} and ${maxNameLength} characters`
+            ? `Must be between ${numeral(minNameLength).format(
+                "0,0"
+              )} and ${numeral(maxNameLength).format("0,0")} characters`
             : undefined
         }
       >
@@ -129,7 +134,9 @@ const ChooseSeatForm: React.FC<ChooseSeatFormProps> = ({
         intent={showValidation && !chipValueValid ? "danger" : undefined}
         helperText={
           showValidation && !chipValueValid
-            ? `Must be between ${minChipCount} and ${maxChipCount}`
+            ? `Must be between ${numeral(minChipCount).format(
+                "0,0"
+              )} and ${numeral(maxChipCount).format("0,0")}`
             : undefined
         }
       >
@@ -139,7 +146,7 @@ const ChooseSeatForm: React.FC<ChooseSeatFormProps> = ({
           min={minChipCount}
           max={maxChipCount}
           stepSize={10}
-          placeholder="0"
+          placeholder={numeral(DEFAULT_CHIPS).format("0,0")}
           onValueChange={(valueAsNumber) => setChipValue(valueAsNumber)}
         />
       </FormGroup>
