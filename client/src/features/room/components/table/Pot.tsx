@@ -2,6 +2,7 @@ import { H4, Tag } from "@blueprintjs/core";
 import { css, StyleSheet } from "aphrodite";
 import numeral from "numeral";
 import { useMemo } from "react";
+import { formatNumber } from "utils/number";
 import { DefaultProps } from "utils/styles";
 import { Theme } from "utils/theme";
 
@@ -22,7 +23,7 @@ const Pot: React.FC<PotProps> = ({ style, pot, toBeAddedToPot }) => {
       icon="lifesaver"
     >
       <H4 className={css(styles.text)}>
-        {numeral(pot - (toBeAddedToPot ?? 0)).format("0,0")}
+        {formatNumber(pot - (toBeAddedToPot ?? 0))}
         {toBeAddedToPot == null || toBeAddedToPot === 0
           ? null
           : ` (+${numeral(toBeAddedToPot).format("0, 0")})`}

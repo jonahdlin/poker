@@ -2,8 +2,10 @@ import { Button } from "@blueprintjs/core";
 import { Tooltip2 } from "@blueprintjs/popover2";
 import { css, StyleSheet } from "aphrodite";
 import { GameStore, PokerAction } from "features/room/utils/game";
-import numeral from "numeral";
+import max from "lodash/max";
 import React, { useMemo } from "react";
+import { Round } from "schema/types";
+import { formatNumber } from "utils/number";
 import { DefaultProps } from "utils/styles";
 
 type PokerControlsProps = DefaultProps & {
@@ -12,6 +14,12 @@ type PokerControlsProps = DefaultProps & {
 
 // For when the round is over but we still want to display some disabled controls
 const DefaultActions: ReadonlyArray<PokerAction> = ["RAISE", "CALL", "FOLD"];
+
+const getHighestBet = (bettingRound: Round["bettingRound"]): number => {
+  return bettingRound === "SHOWING_SUMMARY"
+    ? 0
+    : max(Object.values(bettingRound.betsThisRound).map((n) => n ?? 0)) ?? 0;
+};
 
 const PokerControls: React.FC<PokerControlsProps> = ({ style, gameStore }) => {
   const styles = useStyleSheet();
@@ -31,7 +39,11 @@ const PokerControls: React.FC<PokerControlsProps> = ({ style, gameStore }) => {
     players.filter(({ tablePosition }) => tablePosition != null).length >= 2;
 
   const renderActionButton = (action: PokerAction): React.ReactNode => {
-    if (round == null) {
+    if (
+      round == null ||
+      round.bettingRound === "SHOWING_SUMMARY" ||
+      me == null
+    ) {
       const pokerActionToDisabledButtonTitle: {
         readonly [T in PokerAction]: string;
       } = {
@@ -54,6 +66,19 @@ const PokerControls: React.FC<PokerControlsProps> = ({ style, gameStore }) => {
       );
     }
 
+    const highestBet = getHighestBet(round.bettingRound);
+
+    console.log(highestBet);
+    console.log(round.bettingRound.betsThisRound[me.publicId]);
+    console.log(me.chips);
+
+    const callAmount = Math.min(
+      highestBet - (round.bettingRound.betsThisRound[me.publicId] ?? 0),
+      me.chips ?? 0
+    );
+
+    const minimumRaiseTotalBet = callAmount + round.minimumRaise;
+
     const pokerActionToButton: {
       readonly [T in PokerAction]: React.ReactNode;
     } = {
@@ -64,7 +89,7 @@ const PokerControls: React.FC<PokerControlsProps> = ({ style, gameStore }) => {
           className={css(styles.actionButton)}
           onClick={() => onBettingRaise(round.minimumRaise)}
         >
-          Raise ({numeral(round.minimumRaise).format("0,0")})
+          Raise ({formatNumber(minimumRaiseTotalBet)})
         </Button>
       ),
       BET: (
@@ -74,7 +99,7 @@ const PokerControls: React.FC<PokerControlsProps> = ({ style, gameStore }) => {
           className={css(styles.actionButton)}
           onClick={() => onBettingBet(round.minimumRaise)}
         >
-          Bet ({numeral(round.minimumRaise).format("0,0")})
+          Bet ({formatNumber(round.minimumRaise)})
         </Button>
       ),
       CHECK: (
@@ -91,10 +116,13 @@ const PokerControls: React.FC<PokerControlsProps> = ({ style, gameStore }) => {
         <Button
           key={action}
           outlined
-          className={css(styles.actionButton)}
-          onClick={() => onBettingCall()}
+          className={css(
+            styles.actionButton,
+            callAmount === 0 && styles.disabled
+          )}
+          onClick={callAmount === 0 ? undefined : () => onBettingCall()}
         >
-          Call
+          {callAmount === 0 ? "Call" : `Call (${formatNumber(callAmount)})`}
         </Button>
       ),
       FOLD: (

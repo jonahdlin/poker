@@ -1,6 +1,6 @@
 import { css, StyleSheet } from "aphrodite";
-import Messaging from "features/room/components/Messaging";
-import PokerControls from "features/room/components/PokerControls";
+import Messaging from "features/room/components/messaging/Messaging";
+import PokerControls from "features/room/components/controls/PokerControls";
 import { useGame } from "features/room/utils/game";
 import { useMemo } from "react";
 import { DefaultProps } from "utils/styles";

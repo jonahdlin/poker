@@ -12,7 +12,8 @@
 
 - Set up DB
 - Deploying
-- Git repo
+- ~~Git repo~~
+- Chorus implementation?
 - Remove different ports, host all on same server [docs](https://github.com/websockets/ws#multiple-servers-sharing-a-single-https-server)
 
 #### Game

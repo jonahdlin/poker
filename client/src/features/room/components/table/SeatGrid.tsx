@@ -9,6 +9,7 @@ import { CSSProperties, useMemo, useState } from "react";
 import { TablePosition } from "schema/types";
 import { DefaultProps } from "utils/styles";
 import { Theme } from "utils/theme";
+import { formatNumber } from "utils/number";
 
 type SeatGridProps = DefaultProps & {
   readonly gameStore: GameStore;
@@ -283,13 +284,13 @@ const SeatGrid: React.FC<SeatGridProps> = ({ style, gameStore }) => {
               >
                 <Tooltip2
                   disabled={chipsBetThisBettingRound < 10000}
-                  content={numeral(chipsBetThisBettingRound).format("0,0")}
+                  content={formatNumber(chipsBetThisBettingRound)}
                   placement="top"
                 >
                   <Tag className={css(styles.chipTag)} large minimal round>
                     <H4 className={css(styles.chipText)}>
                       {chipsBetThisBettingRound < 10000
-                        ? numeral(chipsBetThisBettingRound).format("0,0")
+                        ? formatNumber(chipsBetThisBettingRound)
                         : numeral(chipsBetThisBettingRound).format("0,0a")}
                     </H4>
                   </Tag>
@@ -311,12 +312,12 @@ const SeatGrid: React.FC<SeatGridProps> = ({ style, gameStore }) => {
             >
               <Tooltip2
                 disabled={chips < 100000}
-                content={numeral(chips).format("0,0")}
+                content={formatNumber(chips)}
                 placement="top"
               >
                 <Tag icon="bank-account" minimal round large>
                   {chips < 100000
-                    ? numeral(chips).format("0,0")
+                    ? formatNumber(chips)
                     : numeral(chips).format("0,0.00a")}
                 </Tag>
               </Tooltip2>

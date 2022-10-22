@@ -534,14 +534,19 @@ export const handleGameInput = ({
       return;
     }
 
+    const totalBetIncrease =
+      highestBet +
+      input.amount -
+      (bettingRound.betsThisRound[currentPlayerInRound.publicId] ?? 0);
+
     // cannot raise more chips than you have
-    if (currentPlayerInRound.chips < input.amount) {
+    if (currentPlayerInRound.chips < totalBetIncrease) {
       return;
     }
 
     // cannot raise less than last raise unless it's an all in
     if (
-      input.amount != currentPlayerInRound.chips &&
+      totalBetIncrease != currentPlayerInRound.chips &&
       input.amount < bettingRound.lastRaise
     ) {
       return;
@@ -558,10 +563,10 @@ export const handleGameInput = ({
       return;
     }
 
-    currentPlayerInRound.chips -= input.amount;
-    round.pot += input.amount;
+    currentPlayerInRound.chips -= totalBetIncrease;
+    round.pot += totalBetIncrease;
     bettingRound.betsThisRound[currentPlayerInRound.publicId] =
-      (betThisRound ?? 0) + input.amount;
+      (betThisRound ?? 0) + totalBetIncrease;
     bettingRound.lastRaise = input.amount;
     bettingRound.lastRaiserPlayerId = publicPlayerId;
     round.currentTurnPlayerId = nextPlayer.publicId;

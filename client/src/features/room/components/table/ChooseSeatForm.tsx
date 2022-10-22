@@ -9,7 +9,8 @@ import {
 import { Tooltip2 } from "@blueprintjs/popover2";
 import { css, StyleSheet } from "aphrodite";
 import numeral from "numeral";
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { formatNumber } from "utils/number";
 import { DefaultProps } from "utils/styles";
 import { Theme } from "utils/theme";
 
@@ -77,7 +78,7 @@ const ChooseSeatForm: React.FC<ChooseSeatFormProps> = ({
     return true;
   }, [chipValue, maxChipCount, minChipCount]);
 
-  const handleSubmit = () => {
+  const handleSubmit = useCallback(() => {
     if (!chipValueValid || !nameValueValid || chipValue == null) {
       setShowValidation(true);
       return;
@@ -87,7 +88,18 @@ const ChooseSeatForm: React.FC<ChooseSeatFormProps> = ({
       chipCount: chipValue,
       name: sanitizedName.length === 0 ? undefined : sanitizedName,
     });
-  };
+  }, [chipValueValid, nameValueValid, chipValue, sanitizedName, onSubmit]);
+
+  useEffect(() => {
+    const sendFunc = (ev: KeyboardEvent) => {
+      if (ev.key === "Enter") {
+        handleSubmit();
+      }
+    };
+    window.addEventListener("keyup", sendFunc);
+
+    return () => window.removeEventListener("keyup", sendFunc);
+  }, [handleSubmit]);
 
   return (
     <div className={css(styles.root, style)}>
@@ -116,7 +128,7 @@ const ChooseSeatForm: React.FC<ChooseSeatFormProps> = ({
           showValidation && !nameValueValid
             ? `Must be between ${numeral(minNameLength).format(
                 "0,0"
-              )} and ${numeral(maxNameLength).format("0,0")} characters`
+              )} and ${formatNumber(maxNameLength)} characters`
             : undefined
         }
       >
@@ -125,6 +137,7 @@ const ChooseSeatForm: React.FC<ChooseSeatFormProps> = ({
           value={nameValue}
           placeholder={currentName ?? guestName}
           onChange={({ target: { value } }) => setNameValue(value)}
+          autoFocus
         />
       </FormGroup>
       <FormGroup
@@ -136,7 +149,7 @@ const ChooseSeatForm: React.FC<ChooseSeatFormProps> = ({
           showValidation && !chipValueValid
             ? `Must be between ${numeral(minChipCount).format(
                 "0,0"
-              )} and ${numeral(maxChipCount).format("0,0")}`
+              )} and ${formatNumber(maxChipCount)}`
             : undefined
         }
       >
@@ -146,7 +159,7 @@ const ChooseSeatForm: React.FC<ChooseSeatFormProps> = ({
           min={minChipCount}
           max={maxChipCount}
           stepSize={10}
-          placeholder={numeral(DEFAULT_CHIPS).format("0,0")}
+          placeholder={formatNumber(DEFAULT_CHIPS)}
           onValueChange={(valueAsNumber) => setChipValue(valueAsNumber)}
         />
       </FormGroup>

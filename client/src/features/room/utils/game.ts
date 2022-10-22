@@ -306,11 +306,7 @@ export const useGame = ({
     })();
 
     return {
-      publicId: myPlayer.publicId,
-      guestName: myPlayer.guestName,
-      name: myPlayer.name,
-      tablePosition: myPlayer.tablePosition,
-      isConnected: myPlayer.isConnected,
+      ...myPlayer,
       hand: localMeState.hand,
       textMessageTimeout: localMeState?.chatTimeout,
       isLeader: localMeState.isLeader,
@@ -333,10 +329,10 @@ export const useGame = ({
             ...round,
             potThisRound: computePotThisRound(),
             minimumRaise:
-              round?.bettingRound === "SHOWING_SUMMARY" ||
-              round?.bettingRound.lastRaise == null ||
-              round?.bettingRound.lastRaise === 0
-                ? round?.bigBlind ?? 20
+              round.bettingRound === "SHOWING_SUMMARY" ||
+              round.bettingRound.lastRaise == null ||
+              round.bettingRound.lastRaise === 0
+                ? round.bigBlind
                 : round.bettingRound.lastRaise,
           },
 
