@@ -169,6 +169,8 @@ export const startRound = ({
     dealerPlayerId,
     hands,
     foldedPlayers: [],
+    bigBlind,
+    smallBlind: bigBlind / 2,
     pot: smallBlindRealAmount + bigBlindRealAmount,
     currentTurnPlayerId: firstPlayer.publicId,
     roundEnded: false,
@@ -217,7 +219,6 @@ export const handleGameInput = ({
   readonly secretPlayerId: string; // of player who did the input
   readonly input: BettingCall | BettingRaise | BettingBet | BettingFold;
 }) => {
-  console.log(session.round);
   if (
     session.round == null ||
     session.round.currentTurnPlayerId != publicPlayerId ||
@@ -244,8 +245,6 @@ export const handleGameInput = ({
     currentPlayerInRoundIndex == -1
       ? undefined
       : sortedPlayersInRound[currentPlayerInRoundIndex];
-
-  console.log(currentPlayerInRound, sortedPlayersInRound);
 
   if (
     currentPlayerInRound == null ||
@@ -369,6 +368,19 @@ export const handleGameInput = ({
     // Someone won because everyone folded
     if (newSortedPlayersInRound.length == 1) {
       beginNextPhase();
+      return;
+    }
+
+    const highestBet = getHighestBet(bettingRound);
+
+    // First round special case: nobody raised and the big blind just checked
+    if (
+      round.flop == null &&
+      highestBet == bigBlind &&
+      currentPlayerInRound.publicId == bettingRound.startingPlayerId
+    ) {
+      beginNextPhase();
+      return;
     }
 
     if (
@@ -379,7 +391,6 @@ export const handleGameInput = ({
     ) {
       // made it around the circle. If it's the first betting round, the big blind
       // player gets another chance to raise
-      const highestBet = getHighestBet(bettingRound);
       if (
         round.flop == null &&
         highestBet == bigBlind &&
@@ -426,6 +437,11 @@ export const handleGameInput = ({
       return;
     }
 
+    // If you have the highest bet already you can't call
+    if (betThisRound === highestBet) {
+      return;
+    }
+
     const targetAmount = highestBet - (betThisRound ?? 0);
     const realAmount = Math.min(targetAmount, currentPlayerInRound.chips);
 
@@ -445,6 +461,20 @@ export const handleGameInput = ({
     }
 
     const highestBet = getHighestBet(bettingRound);
+
+    // First betting round edge case:
+    // If you were the big blind and nobody raised, when it comes back to you
+    // you can either raise, check or fold (but not call, like everyone else)
+    if (
+      input.amount == 0 &&
+      round.bettingRound != "SHOWING_SUMMARY" &&
+      round.flop == null &&
+      highestBet == bigBlind &&
+      currentPlayerInRound.publicId == round.bettingRound.startingPlayerId
+    ) {
+      advanceTurnOrRoundIfDone();
+      return;
+    }
 
     // cannot check (bet of 0) or bet if there has already been a nonzero bet,
     // in that case you can only call or raise

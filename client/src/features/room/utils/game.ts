@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Hand,
   GameState,
@@ -24,9 +24,13 @@ export type GenericPlayer = {
   readonly secondsLeftInTurn?: number;
 };
 
+export type PokerAction = "RAISE" | "CALL" | "CHECK" | "BET" | "FOLD";
+
 export type MePlayer = GenericPlayer & {
   readonly hand?: Hand;
   readonly isLeader: boolean;
+
+  readonly availableActions: ReadonlyArray<PokerAction>;
 };
 
 export type GameStore = {
@@ -48,6 +52,7 @@ export type GameStore = {
   readonly isGameStarted: boolean;
   readonly round?: Round & {
     readonly potThisRound: number;
+    readonly minimumRaise: number;
   };
 
   readonly getPlayerByPublicId: (
@@ -248,32 +253,91 @@ export const useGame = ({
     ).reduce<number>((acc, amt) => acc + (amt ?? 0), 0);
   };
 
+  const round = localState?.round;
+
+  const me = useMemo((): MePlayer | undefined => {
+    if (myPlayer == null || localMeState == null) {
+      return;
+    }
+
+    const availableActions = (() => {
+      if (round == null || round.bettingRound === "SHOWING_SUMMARY") {
+        return [];
+      }
+
+      const maxBet = Object.values(
+        round.bettingRound.betsThisRound
+      ).reduce<number>((acc, bet) => Math.max(acc, bet ?? 0), 0);
+
+      // true if it is
+      // - the first betting round
+      // - you are the big blind
+      // - nobody has raised yet
+      const firstRoundCheckException =
+        round.flop == null &&
+        round.bettingRound.startingPlayerId === myPlayer.publicId &&
+        maxBet === round.bigBlind;
+
+      const includeBet = round.bettingRound.lastRaiserPlayerId == null;
+
+      const includeRaise = round.bettingRound.lastRaiserPlayerId != null;
+
+      const includeCheck =
+        round.bettingRound.lastRaiserPlayerId == null ||
+        firstRoundCheckException;
+
+      const includeCall =
+        round.bettingRound.lastRaiserPlayerId != null &&
+        !firstRoundCheckException;
+
+      const includeFold = true;
+
+      const allActions: ReadonlyArray<PokerAction | false> = [
+        includeBet && "BET",
+        includeRaise && "RAISE",
+        includeCheck && "CHECK",
+        includeCall && "CALL",
+        includeFold && "FOLD",
+      ];
+
+      return allActions.filter(
+        (actionOrFalse) => actionOrFalse
+      ) as ReadonlyArray<PokerAction>;
+    })();
+
+    return {
+      publicId: myPlayer.publicId,
+      guestName: myPlayer.guestName,
+      name: myPlayer.name,
+      tablePosition: myPlayer.tablePosition,
+      isConnected: myPlayer.isConnected,
+      hand: localMeState.hand,
+      textMessageTimeout: localMeState?.chatTimeout,
+      isLeader: localMeState.isLeader,
+      availableActions,
+    };
+  }, [myPlayer, localMeState, round]);
+
   return {
     isConnected: socket != null && !disconnected,
     isLoading: socket == null && !disconnected,
 
     players: genericPlayers,
-    me:
-      myPlayer == null || localMeState == null
-        ? undefined
-        : {
-            publicId: myPlayer.publicId,
-            guestName: myPlayer.guestName,
-            name: myPlayer.name,
-            tablePosition: myPlayer.tablePosition,
-            isConnected: myPlayer.isConnected,
-            hand: localMeState.hand,
-            textMessageTimeout: localMeState?.chatTimeout,
-            isLeader: localMeState.isLeader,
-          },
+    me,
     availableSeats: AllSeats.filter((seat) => !takenSeats.includes(seat)),
     isGameStarted: localState?.gameStarted ?? false,
     round:
-      localState?.round == null
+      round == null
         ? undefined
         : {
-            ...localState.round,
+            ...round,
             potThisRound: computePotThisRound(),
+            minimumRaise:
+              round?.bettingRound === "SHOWING_SUMMARY" ||
+              round?.bettingRound.lastRaise == null ||
+              round?.bettingRound.lastRaise === 0
+                ? round?.bigBlind ?? 20
+                : round.bettingRound.lastRaise,
           },
 
     maxTextMessageLength: localState?.maxTextMessageLength ?? 500,

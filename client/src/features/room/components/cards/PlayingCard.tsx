@@ -1,6 +1,6 @@
 import { Colors, Text } from "@blueprintjs/core";
 import { css, StyleSheet } from "aphrodite";
-import Suit, { SuitToColour } from "features/room/components/Suit";
+import Suit, { SuitToColour } from "features/room/components/cards/Suit";
 import { useMemo } from "react";
 import { Card } from "schema/types";
 import { DefaultProps } from "utils/styles";

@@ -151,6 +151,13 @@ export const isBettingFold = (arg: unknown): arg is BettingFold => {
   return arg != null && typeof arg == "object" && "isTypeBettingFold" in arg;
 };
 
+export type ResetGame = {
+  readonly isTypeResetGame: true;
+};
+export const isResetGame = (arg: unknown): arg is ResetGame => {
+  return arg != null && typeof arg == "object" && "isTypeResetGame" in arg;
+};
+
 export type RoomClientToServer =
   | SitAtTable
   | LeaveTable
@@ -159,7 +166,8 @@ export type RoomClientToServer =
   | BettingCall
   | BettingRaise
   | BettingBet
-  | BettingFold;
+  | BettingFold
+  | ResetGame;
 
 export type RoomNotFound = {
   readonly isTypeRoomNotFound: true;
@@ -245,6 +253,8 @@ export type Round = {
   // chip/betting info
   readonly pot: number;
   readonly foldedPlayers: Array<string>; // public player ID
+  readonly bigBlind: number;
+  readonly smallBlind: number;
 
   // player positions
   readonly dealerPlayerId: string; // public player ID
@@ -266,7 +276,6 @@ export type GameState = {
   readonly players: ReadonlyArray<PlayerDataNoId>;
   readonly gameStarted: boolean;
   readonly round?: Round;
-  readonly bigBlind: number;
 
   readonly textMessageHistory: ReadonlyArray<TextMessageHistoryEntry>;
 };

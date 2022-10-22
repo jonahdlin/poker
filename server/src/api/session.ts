@@ -12,6 +12,7 @@ import {
   isBettingFold,
   isBettingRaise,
   isLeaveTable,
+  isResetGame,
   isSendTextMessage,
   isSitAtTable,
   isStartGame,
@@ -71,7 +72,7 @@ export const createRoomWs = (app: Express, port: number) => {
     minInitialChipCount,
     players,
     textMessageHistory,
-    bigBlind,
+    bigBlind, // divisible by 2
     round,
   }: Session): GameState => {
     return {
@@ -93,7 +94,6 @@ export const createRoomWs = (app: Express, port: number) => {
         })
       ),
       textMessageHistory,
-      bigBlind,
       round:
         round == null
           ? undefined
@@ -108,6 +108,8 @@ export const createRoomWs = (app: Express, port: number) => {
               dealerPlayerId: round.dealerPlayerId,
               currentTurnPlayerId: round.currentTurnPlayerId,
               bettingRound: round.bettingRound,
+              bigBlind,
+              smallBlind: bigBlind / 2,
             },
     };
   };
@@ -247,6 +249,21 @@ export const createRoomWs = (app: Express, port: number) => {
           });
         }
       } else if (isStartGame(data)) {
+        const sortedValidPlayers = sortPlayersBySeat(session.players).filter(
+          ({ chips }) => chips != null && chips > 0
+        );
+
+        if (!player.isLeader || sortedValidPlayers.length < 2) {
+          return;
+        }
+        session.gameStarted = true;
+        session.round = startRound({
+          players: session.players,
+          dealerPlayerId: shuffle(sortedValidPlayers)[0].publicId,
+          bigBlind: session.bigBlind,
+        });
+        session.players;
+      } else if (isResetGame(data)) {
         const sortedValidPlayers = sortPlayersBySeat(session.players).filter(
           ({ chips }) => chips != null && chips > 0
         );

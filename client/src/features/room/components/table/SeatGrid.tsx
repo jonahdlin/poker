@@ -2,7 +2,7 @@ import { Button, Card, Tag, H6, H4 } from "@blueprintjs/core";
 import { Popover2, Tooltip2 } from "@blueprintjs/popover2";
 import { css, StyleSheet } from "aphrodite";
 import ChooseSeatForm from "features/room/components/table/ChooseSeatForm";
-import Hand from "features/room/components/Hand";
+import Hand from "features/room/components/cards/Hand";
 import { AllSeats, GameStore } from "features/room/utils/game";
 import numeral from "numeral";
 import { CSSProperties, useMemo, useState } from "react";
@@ -236,10 +236,10 @@ const SeatGrid: React.FC<SeatGridProps> = ({ style, gameStore }) => {
         const isMe = me != null && sittingPlayer.publicId === me?.publicId;
 
         const chips = sittingPlayer.chips ?? 0;
-        const chipsBetThisBettingRound = 9999;
-        // round == null || round.bettingRound === "SHOWING_SUMMARY"
-        //   ? undefined
-        //   : round.bettingRound.betsThisRound[sittingPlayer.publicId];
+        const chipsBetThisBettingRound =
+          round == null || round.bettingRound === "SHOWING_SUMMARY"
+            ? undefined
+            : round.bettingRound.betsThisRound[sittingPlayer.publicId];
 
         return (
           <Card

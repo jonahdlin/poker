@@ -12,7 +12,7 @@ type TableProps = DefaultProps & {
 const Table: React.FC<TableProps> = ({ style, gameStore }) => {
   const styles = useStyleSheet();
 
-  const { me, round } = gameStore;
+  const { me } = gameStore;
 
   if (me == null) {
     return null;
@@ -20,17 +20,7 @@ const Table: React.FC<TableProps> = ({ style, gameStore }) => {
 
   return (
     <div className={css(styles.root, style)}>
-      <PokerTable
-        style={styles.tableSurface}
-        pot={round?.pot}
-        toBeAddedToPot={
-          round?.bettingRound == null ||
-          round?.bettingRound === "SHOWING_SUMMARY" ||
-          round.potThisRound === 0
-            ? undefined
-            : round.potThisRound
-        }
-      />
+      <PokerTable style={styles.tableSurface} gameStore={gameStore} />
       <SeatGrid style={styles.seats} gameStore={gameStore} />
     </div>
   );

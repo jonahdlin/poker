@@ -1,7 +1,7 @@
 import { css, StyleSheet } from "aphrodite";
 import PlayingCard, {
   PlayingCardAspectRatio,
-} from "features/room/components/PlayingCard";
+} from "features/room/components/cards/PlayingCard";
 import { useMemo } from "react";
 import { Card } from "schema/types";
 import { DefaultProps } from "utils/styles";
