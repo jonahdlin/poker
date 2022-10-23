@@ -1,4 +1,4 @@
-import { Button, Card, Tag, H6, H4 } from "@blueprintjs/core";
+import { Button, Card, Tag, H6, H4, Colors } from "@blueprintjs/core";
 import { Popover2, Tooltip2 } from "@blueprintjs/popover2";
 import { css, StyleSheet } from "aphrodite";
 import ChooseSeatForm from "features/room/components/table/ChooseSeatForm";
@@ -252,9 +252,9 @@ const SeatGrid: React.FC<SeatGridProps> = ({ style, gameStore }) => {
                 TablePositionToHandPosition[seat] === "LEFT"
                   ? "flex-end"
                   : "flex-start",
-              ...(round?.currentTurnPlayerId === sittingPlayer.publicId
+              ...((round?.foldedPlayers ?? []).includes(sittingPlayer.publicId)
                 ? {
-                    outline: `2px solid ${Theme.outline}`,
+                    opacity: 0.6,
                   }
                 : {}),
             }}
@@ -264,6 +264,16 @@ const SeatGrid: React.FC<SeatGridProps> = ({ style, gameStore }) => {
                 : undefined
             }
           >
+            {round?.currentTurnPlayerId === sittingPlayer.publicId && (
+              <div
+                className={css(styles.turnIndicator)}
+                style={
+                  TablePositionToHandPosition[seat] === "LEFT"
+                    ? { right: 4 }
+                    : { left: 4 }
+                }
+              />
+            )}
             {round != null && (
               <Hand
                 style={[
@@ -351,6 +361,15 @@ const useStyleSheet = () => {
           flexDirection: "column",
           position: "relative",
           padding: 0,
+        },
+        turnIndicator: {
+          position: "absolute",
+          bottom: 4,
+          width: "76%",
+          height: 5,
+          zIndex: 0,
+          borderRadius: 2,
+          backgroundColor: Colors.GREEN5,
         },
         playerNameInSeatWrapper: {
           display: "flex",
