@@ -1,11 +1,12 @@
-import { Button } from "@blueprintjs/core";
+import { Button, Text } from "@blueprintjs/core";
 import { Tooltip2 } from "@blueprintjs/popover2";
 import { css, StyleSheet } from "aphrodite";
+import ChipCount from "features/room/components/controls/ChipCount";
+import WagerButton from "features/room/components/controls/WagerButton";
 import { GameStore, PokerAction } from "features/room/utils/game";
 import max from "lodash/max";
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { Round } from "schema/types";
-import { formatNumber } from "utils/number";
 import { DefaultProps } from "utils/styles";
 
 type PokerControlsProps = DefaultProps & {
@@ -23,6 +24,9 @@ const getHighestBet = (bettingRound: Round["bettingRound"]): number => {
 
 const PokerControls: React.FC<PokerControlsProps> = ({ style, gameStore }) => {
   const styles = useStyleSheet();
+
+  const [customRaise, setCustomRaise] = useState<number>();
+  const [customBet, setCustomBet] = useState<number>();
 
   const {
     me,
@@ -42,7 +46,8 @@ const PokerControls: React.FC<PokerControlsProps> = ({ style, gameStore }) => {
     if (
       round == null ||
       round.bettingRound === "SHOWING_SUMMARY" ||
-      me == null
+      me == null ||
+      me.chips == null
     ) {
       const pokerActionToDisabledButtonTitle: {
         readonly [T in PokerAction]: string;
@@ -53,6 +58,23 @@ const PokerControls: React.FC<PokerControlsProps> = ({ style, gameStore }) => {
         CALL: "Call",
         FOLD: "Fold",
       };
+
+      if (action === "RAISE") {
+        return (
+          <WagerButton
+            key={action}
+            disabled
+            callAmount={0}
+            wagerMinimum={0}
+            maximum={0}
+            onChange={() => {}}
+            wager={0}
+            onSubmit={() => {}}
+          >
+            {pokerActionToDisabledButtonTitle.RAISE}
+          </WagerButton>
+        );
+      }
 
       return (
         <Button
@@ -68,39 +90,157 @@ const PokerControls: React.FC<PokerControlsProps> = ({ style, gameStore }) => {
 
     const highestBet = getHighestBet(round.bettingRound);
 
-    console.log(highestBet);
-    console.log(round.bettingRound.betsThisRound[me.publicId]);
-    console.log(me.chips);
-
     const callAmount = Math.min(
       highestBet - (round.bettingRound.betsThisRound[me.publicId] ?? 0),
-      me.chips ?? 0
+      me.chips
     );
 
-    const minimumRaiseTotalBet = callAmount + round.minimumRaise;
+    const minimumRaiseTotalBet = Math.min(
+      callAmount + round.minimumRaise,
+      me.chips
+    );
+
+    const callTitle = (() => {
+      if (callAmount === 0) {
+        return "Call";
+      }
+
+      // all in
+      if (callAmount === me.chips) {
+        return (
+          <div className={css(styles.textAndChips)}>
+            <Text>All in</Text>
+            <ChipCount count={callAmount} />
+          </div>
+        );
+      }
+
+      return (
+        <div className={css(styles.textAndChips)}>
+          <Text>Call</Text>
+          <ChipCount count={callAmount} />
+        </div>
+      );
+    })();
+
+    const raiseDisabledNotEnoughChips = minimumRaiseTotalBet < callAmount;
+
+    const raiseTitle = (() => {
+      if (raiseDisabledNotEnoughChips) {
+        return "Raise";
+      }
+
+      // all in
+      if (minimumRaiseTotalBet === me.chips) {
+        return (
+          <div className={css(styles.textAndChips)}>
+            <Text>All in</Text>
+            <ChipCount count={callAmount} />
+          </div>
+        );
+      }
+      if (customRaise != null && customRaise + callAmount === me.chips) {
+        return (
+          <div className={css(styles.textAndChips)}>
+            <Text>All in</Text>
+            <ChipCount count={customRaise + callAmount} />
+          </div>
+        );
+      }
+
+      if (customRaise != null) {
+        return (
+          <div className={css(styles.textAndChips)}>
+            <Text>Raise</Text>
+            <ChipCount count={customRaise + callAmount} />
+          </div>
+        );
+      }
+
+      return (
+        <div className={css(styles.textAndChips)}>
+          <Text>Raise</Text>
+          <ChipCount count={minimumRaiseTotalBet} />
+        </div>
+      );
+    })();
+
+    const betTitle = (() => {
+      if (raiseDisabledNotEnoughChips) {
+        return "Bet";
+      }
+
+      // all in
+      if (minimumRaiseTotalBet === me.chips) {
+        return (
+          <div className={css(styles.textAndChips)}>
+            <Text>Bet</Text>
+            <ChipCount count={callAmount} />
+          </div>
+        );
+      }
+      if (customBet != null && customBet + callAmount === me.chips) {
+        return (
+          <div className={css(styles.textAndChips)}>
+            <Text>All in</Text>
+            <ChipCount count={customBet + callAmount} />
+          </div>
+        );
+      }
+
+      if (customBet != null) {
+        return (
+          <div className={css(styles.textAndChips)}>
+            <Text>Bet</Text>
+            <ChipCount count={customBet + callAmount} />
+          </div>
+        );
+      }
+
+      return (
+        <div className={css(styles.textAndChips)}>
+          <Text>Bet</Text>
+          <ChipCount count={minimumRaiseTotalBet} />
+        </div>
+      );
+    })();
 
     const pokerActionToButton: {
       readonly [T in PokerAction]: React.ReactNode;
     } = {
       RAISE: (
-        <Button
+        <WagerButton
           key={action}
-          outlined
-          className={css(styles.actionButton)}
-          onClick={() => onBettingRaise(round.minimumRaise)}
+          disabled={raiseDisabledNotEnoughChips}
+          callAmount={callAmount}
+          wagerMinimum={round.minimumRaise}
+          maximum={me.chips}
+          onChange={(raise) => setCustomRaise(raise)}
+          wager={customRaise || minimumRaiseTotalBet - callAmount}
+          onSubmit={() => {
+            onBettingRaise(customRaise ?? minimumRaiseTotalBet - callAmount);
+            setCustomRaise(undefined);
+          }}
         >
-          Raise ({formatNumber(minimumRaiseTotalBet)})
-        </Button>
+          {raiseTitle}
+        </WagerButton>
       ),
       BET: (
-        <Button
+        <WagerButton
           key={action}
-          outlined
-          className={css(styles.actionButton)}
-          onClick={() => onBettingBet(round.minimumRaise)}
+          disabled={raiseDisabledNotEnoughChips}
+          callAmount={0}
+          wagerMinimum={round.minimumRaise}
+          maximum={me.chips}
+          onChange={(bet) => setCustomBet(bet)}
+          wager={customBet || minimumRaiseTotalBet}
+          onSubmit={() => {
+            onBettingBet(customBet ?? minimumRaiseTotalBet);
+            setCustomBet(undefined);
+          }}
         >
-          Bet ({formatNumber(round.minimumRaise)})
-        </Button>
+          {betTitle}
+        </WagerButton>
       ),
       CHECK: (
         <Button
@@ -122,7 +262,7 @@ const PokerControls: React.FC<PokerControlsProps> = ({ style, gameStore }) => {
           )}
           onClick={callAmount === 0 ? undefined : () => onBettingCall()}
         >
-          {callAmount === 0 ? "Call" : `Call (${formatNumber(callAmount)})`}
+          {callTitle}
         </Button>
       ),
       FOLD: (
@@ -212,6 +352,28 @@ const useStyleSheet = () => {
           opacity: 0.65,
           cursor: "default",
           pointerEvents: "none",
+        },
+        buttonGroup: {
+          display: "flex",
+          alignItems: "stretch",
+        },
+        leftButtonInGroup: {
+          borderTopRightRadius: 0,
+          borderBottomRightRadius: 0,
+        },
+        rightButtonInGroup: {
+          borderTopLeftRadius: 0,
+          borderBottomLeftRadius: 0,
+          borderLeft: 0,
+        },
+        moreButton: {
+          height: 100,
+          padding: 8,
+        },
+        textAndChips: {
+          display: "flex",
+          alignItems: "center",
+          gap: 6,
         },
       }),
     []
