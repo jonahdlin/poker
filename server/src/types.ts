@@ -225,6 +225,25 @@ export type TextMessageHistoryEntry = {
   readonly time: number;
 };
 
+export const HandTypes = [
+  "STRAIGHT_FLUSH",
+  "FOUR_OF_A_KIND",
+  "FULL_HOUSE",
+  "FLUSH",
+  "STRAIGHT",
+  "THREE_OF_A_KIND",
+  "TWO_PAIR",
+  "PAIR",
+  "HIGH_CARD",
+] as const;
+
+export type HandType = typeof HandTypes[number];
+
+export type HandQuality<T extends HandType> = {
+  readonly type: T;
+  readonly cards: ReadonlyArray<Card>;
+};
+
 export type BettingRoundData = {
   readonly lastRaise?: number; // kept track of for minimum raises on top of current bet
   readonly lastRaiserPlayerId?: string; // public player ID
