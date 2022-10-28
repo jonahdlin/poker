@@ -9,6 +9,7 @@ import {
   takeRight,
 } from "lodash";
 import { Card, Hand, HandQuality, HandType, Suit } from "src/types";
+import { ExtractStrict } from "src/utils/types";
 
 // ========================
 // Notes
@@ -53,13 +54,13 @@ kind or it may decide there is no 3 of a kind.
 // ========================
 // Types
 // ========================
-type Cards2 = readonly [Card, Card];
-type Cards3 = readonly [Card, Card, Card];
-type Cards4 = readonly [Card, Card, Card, Card];
-type Cards5 = readonly [Card, Card, Card, Card, Card];
-type Cards6 = readonly [Card, Card, Card, Card, Card, Card];
-type Cards7 = readonly [Card, Card, Card, Card, Card, Card, Card];
-type FeasibleCards = Cards2 | Cards3 | Cards4 | Cards5 | Cards6 | Cards7;
+export type Cards2 = readonly [Card, Card];
+export type Cards3 = readonly [Card, Card, Card];
+export type Cards4 = readonly [Card, Card, Card, Card];
+export type Cards5 = readonly [Card, Card, Card, Card, Card];
+export type Cards6 = readonly [Card, Card, Card, Card, Card, Card];
+export type Cards7 = readonly [Card, Card, Card, Card, Card, Card, Card];
+export type FeasibleCards = Cards2 | Cards3 | Cards4 | Cards5 | Cards6 | Cards7;
 const isCards2 = (arg: ReadonlyArray<Card>): arg is Cards2 => {
   return arg.length === 2;
 };
@@ -461,7 +462,132 @@ export const getBestHand = (cards: FeasibleCards): HandQuality<HandType> => {
 // ========================
 // Winner of n hands
 // ========================
-// returns index of winner TODO
-export const winner = (...args: ReadonlyArray<FeasibleCards>): number => {
-  return 0;
+type SubjectResult = "LOSE" | "WIN" | "TIE";
+const HandRanking: { readonly [T in HandType]: number } = {
+  HIGH_CARD: 1,
+  PAIR: 2,
+  TWO_PAIR: 3,
+  THREE_OF_A_KIND: 4,
+  STRAIGHT: 5,
+  FLUSH: 6,
+  FULL_HOUSE: 7,
+  FOUR_OF_A_KIND: 8,
+  STRAIGHT_FLUSH: 9,
+};
+
+// assumes subject and opponent have the same hand length, and enforces that
+// the two hands are of the same type to help with that
+// subject wins if their cards are index-wise higher than opponents, e.g.
+// subject:  [A, 7, 5, J, 3]
+// opponent: [A, 6, A, A, A]
+// ===> subject wins, 7 is higher than 6
+// subject:  [A, 7, 5, J, 3]
+// opponent: [A, 7, A, A, A]
+// ===> subject loses, A is higher than 5
+// subject:  [A, 7, 5, J, 3]
+// opponent: [A, 7, 5, J, 3]
+// ===> subject ties, all cards are equal
+const cardByCardWinner2 = <T extends HandType>(
+  subject: HandQuality<T>,
+  opponent: HandQuality<T>
+): SubjectResult => {
+  const result = subject.cards.reduce<ExtractStrict<
+    SubjectResult,
+    "WIN" | "LOSE"
+  > | null>((acc, card, index) => {
+    if (acc !== null) {
+      return acc;
+    }
+    const subjectCardValue = ValueOrder[card.value];
+    const opponentCardValue = ValueOrder[opponent.cards[index].value];
+    if (subjectCardValue > opponentCardValue) {
+      return "WIN";
+    }
+
+    if (opponentCardValue > subjectCardValue) {
+      return "LOSE";
+    }
+
+    return null;
+  }, null);
+
+  return result ?? "TIE";
+};
+
+const winner2 = (
+  subject: HandQuality<HandType>,
+  opponent: HandQuality<HandType>
+): SubjectResult => {
+  const subjectBestHand = getBestHand(subject.cards as FeasibleCards);
+  const opponentBestHand = getBestHand(opponent.cards as FeasibleCards);
+  const subjectRank = HandRanking[subjectBestHand.type];
+  const opponentRank = HandRanking[opponentBestHand.type];
+
+  if (subjectRank > opponentRank) {
+    return "WIN";
+  }
+
+  if (subjectRank < opponentRank) {
+    return "LOSE";
+  }
+
+  return cardByCardWinner2(subjectBestHand, opponentBestHand);
+};
+
+export type PlayerResult = {
+  readonly index: number;
+  readonly bestHand: HandQuality<HandType>;
+};
+
+// returns groups of winners from best to worst, with tied players grouped in
+// arrays. Each result contains the index from the arg list and the best hand
+// for that player
+// if this is called with the following 5 hands in this order
+// 0: J high 3 of a kind with kickers A, 2
+// 1: 9 high flush
+// 2: J high 3 of a kind with kickers A, 2
+// 3: Q high flush
+// 4: high card
+// Then the result will be (the result objects for) [[3], [1], [0, 2], [4]]
+export const winners = (
+  ...args: ReadonlyArray<FeasibleCards>
+): ReadonlyArray<ReadonlyArray<PlayerResult>> => {
+  const result: Array<Array<PlayerResult>> = [];
+
+  args.forEach((fullHand, index) => {
+    const bestHand = getBestHand(fullHand);
+    if (result.length === 0) {
+      result.push([{ index, bestHand }]);
+      return;
+    }
+    for (let i = 0; i < result.length; i++) {
+      const currentOpponent = result[i][0].bestHand;
+      const subjectResult = winner2(bestHand, currentOpponent);
+      if (subjectResult === "LOSE") {
+        continue;
+      }
+
+      if (subjectResult === "TIE") {
+        result[i].push({ index, bestHand });
+        return;
+      }
+
+      result.splice(i, 0, [
+        {
+          index,
+          bestHand,
+        },
+      ]);
+      return;
+    }
+
+    result.push([
+      {
+        index,
+        bestHand,
+      },
+    ]);
+  });
+
+  return result;
 };
