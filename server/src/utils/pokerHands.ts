@@ -8,7 +8,15 @@ import {
   take,
   takeRight,
 } from "lodash";
-import { Card, Hand, HandQuality, HandType, Suit } from "src/types";
+import {
+  Card,
+  Hand,
+  HandQuality,
+  HandType,
+  PlayerResult,
+  RoundWinners,
+  Suit,
+} from "src/types";
 import { ExtractStrict } from "src/utils/types";
 
 // ========================
@@ -78,6 +86,16 @@ const isCards6 = (arg: ReadonlyArray<Card>): arg is Cards6 => {
 };
 const isCards7 = (arg: ReadonlyArray<Card>): arg is Cards7 => {
   return arg.length === 7;
+};
+const isFeasibleCards = (arg: ReadonlyArray<Card>): arg is FeasibleCards => {
+  return (
+    isCards2(arg) ||
+    isCards3(arg) ||
+    isCards4(arg) ||
+    isCards5(arg) ||
+    isCards6(arg) ||
+    isCards7(arg)
+  );
 };
 const isCardsGtEq5 = (
   arg: ReadonlyArray<Card>
@@ -534,11 +552,6 @@ const winner2 = (
   return cardByCardWinner2(subjectBestHand, opponentBestHand);
 };
 
-export type PlayerResult = {
-  readonly index: number;
-  readonly bestHand: HandQuality<HandType>;
-};
-
 // returns groups of winners from best to worst, with tied players grouped in
 // arrays. Each result contains the index from the arg list and the best hand
 // for that player
@@ -550,14 +563,20 @@ export type PlayerResult = {
 // 4: high card
 // Then the result will be (the result objects for) [[3], [1], [0, 2], [4]]
 export const winners = (
-  ...args: ReadonlyArray<FeasibleCards>
-): ReadonlyArray<ReadonlyArray<PlayerResult>> => {
+  ...args: ReadonlyArray<{
+    readonly id: string;
+    readonly cards: ReadonlyArray<Card> | FeasibleCards;
+  }>
+): RoundWinners => {
   const result: Array<Array<PlayerResult>> = [];
 
-  args.forEach((fullHand, index) => {
+  args.forEach(({ id, cards: fullHand }, index) => {
+    if (!isFeasibleCards(fullHand)) {
+      return;
+    }
     const bestHand = getBestHand(fullHand);
     if (result.length === 0) {
-      result.push([{ index, bestHand }]);
+      result.push([{ id, bestHand }]);
       return;
     }
     for (let i = 0; i < result.length; i++) {
@@ -568,13 +587,13 @@ export const winners = (
       }
 
       if (subjectResult === "TIE") {
-        result[i].push({ index, bestHand });
+        result[i].push({ id, bestHand });
         return;
       }
 
       result.splice(i, 0, [
         {
-          index,
+          id,
           bestHand,
         },
       ]);
@@ -583,7 +602,7 @@ export const winners = (
 
     result.push([
       {
-        index,
+        id,
         bestHand,
       },
     ]);

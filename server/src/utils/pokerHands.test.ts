@@ -1480,18 +1480,21 @@ describe("Poker hand functions", () => {
         ];
         const bestHand2 = getBestHand(hand2);
 
-        const result = winners(hand1, hand2);
+        const result = winners(
+          { id: "1", cards: hand1 },
+          { id: "2", cards: hand2 }
+        );
 
         expect(result).toMatchObject([
           [
             {
-              index: 0,
+              id: "1",
               bestHand: bestHand1,
             },
           ],
           [
             {
-              index: 1,
+              id: "2",
               bestHand: bestHand2,
             },
           ],
@@ -1517,18 +1520,21 @@ describe("Poker hand functions", () => {
         const hand2: Cards7 = [...communityCards, c(9, "CLUB"), c(8, "CLUB")];
         const bestHand2 = getBestHand(hand2);
 
-        const result = winners(hand1, hand2);
+        const result = winners(
+          { id: "1", cards: hand1 },
+          { id: "2", cards: hand2 }
+        );
 
         expect(result).toMatchObject([
           [
             {
-              index: 0,
+              id: "1",
               bestHand: bestHand1,
             },
           ],
           [
             {
-              index: 1,
+              id: "2",
               bestHand: bestHand2,
             },
           ],
@@ -1558,18 +1564,21 @@ describe("Poker hand functions", () => {
         ];
         const bestHand2 = getBestHand(hand2);
 
-        const result = winners(hand1, hand2);
+        const result = winners(
+          { id: "1", cards: hand1 },
+          { id: "2", cards: hand2 }
+        );
 
         expect(result).toMatchObject([
           [
             {
-              index: 1,
+              id: "2",
               bestHand: bestHand2,
             },
           ],
           [
             {
-              index: 0,
+              id: "1",
               bestHand: bestHand1,
             },
           ],
@@ -1599,18 +1608,21 @@ describe("Poker hand functions", () => {
         ];
         const bestHand2 = getBestHand(hand2);
 
-        const result = winners(hand1, hand2);
+        const result = winners(
+          { id: "1", cards: hand1 },
+          { id: "2", cards: hand2 }
+        );
 
         expect(result).toMatchObject([
           [
             {
-              index: 0,
+              id: "1",
               bestHand: bestHand1,
             },
           ],
           [
             {
-              index: 1,
+              id: "2",
               bestHand: bestHand2,
             },
           ],
@@ -1640,18 +1652,21 @@ describe("Poker hand functions", () => {
         ];
         const bestHand2 = getBestHand(hand2);
 
-        const result = winners(hand1, hand2);
+        const result = winners(
+          { id: "1", cards: hand1 },
+          { id: "2", cards: hand2 }
+        );
 
         expect(result).toMatchObject([
           [
             {
-              index: 1,
+              id: "2",
               bestHand: bestHand2,
             },
           ],
           [
             {
-              index: 0,
+              id: "1",
               bestHand: bestHand1,
             },
           ],
@@ -1681,18 +1696,21 @@ describe("Poker hand functions", () => {
         ];
         const bestHand2 = getBestHand(hand2);
 
-        const result = winners(hand1, hand2);
+        const result = winners(
+          { id: "1", cards: hand1 },
+          { id: "2", cards: hand2 }
+        );
 
         expect(result).toMatchObject([
           [
             {
-              index: 1,
+              id: "2",
               bestHand: bestHand2,
             },
           ],
           [
             {
-              index: 0,
+              id: "1",
               bestHand: bestHand1,
             },
           ],
@@ -1718,18 +1736,21 @@ describe("Poker hand functions", () => {
         ];
         const bestHand2 = getBestHand(hand2);
 
-        const result = winners(hand1, hand2);
+        const result = winners(
+          { id: "1", cards: hand1 },
+          { id: "2", cards: hand2 }
+        );
 
         expect(result).toMatchObject([
           [
             {
-              index: 0,
+              id: "1",
               bestHand: bestHand1,
             },
           ],
           [
             {
-              index: 1,
+              id: "2",
               bestHand: bestHand2,
             },
           ],
@@ -1759,18 +1780,21 @@ describe("Poker hand functions", () => {
         ];
         const bestHand2 = getBestHand(hand2);
 
-        const result = winners(hand1, hand2);
+        const result = winners(
+          { id: "1", cards: hand1 },
+          { id: "2", cards: hand2 }
+        );
 
         expect(result).toMatchObject([
           [
             {
-              index: 1,
+              id: "2",
               bestHand: bestHand2,
             },
           ],
           [
             {
-              index: 0,
+              id: "1",
               bestHand: bestHand1,
             },
           ],
@@ -1796,18 +1820,21 @@ describe("Poker hand functions", () => {
         ];
         const bestHand2 = getBestHand(hand2);
 
-        const result = winners(hand1, hand2);
+        const result = winners(
+          { id: "1", cards: hand1 },
+          { id: "2", cards: hand2 }
+        );
 
         expect(result).toMatchObject([
           [
             {
-              index: 0,
+              id: "1",
               bestHand: bestHand1,
             },
           ],
           [
             {
-              index: 1,
+              id: "2",
               bestHand: bestHand2,
             },
           ],
@@ -1833,18 +1860,21 @@ describe("Poker hand functions", () => {
         ];
         const bestHand2 = getBestHand(hand2);
 
-        const result = winners(hand1, hand2);
+        const result = winners(
+          { id: "1", cards: hand1 },
+          { id: "2", cards: hand2 }
+        );
 
         expect(result).toMatchObject([
           [
             {
-              index: 0,
+              id: "1",
               bestHand: bestHand1,
             },
           ],
           [
             {
-              index: 1,
+              id: "2",
               bestHand: bestHand2,
             },
           ],
@@ -1874,18 +1904,21 @@ describe("Poker hand functions", () => {
         ];
         const bestHand2 = getBestHand(hand2);
 
-        const result = winners(hand1, hand2);
+        const result = winners(
+          { id: "1", cards: hand1 },
+          { id: "2", cards: hand2 }
+        );
 
         expect(result).toMatchObject([
           [
             {
-              index: 0,
+              id: "1",
               bestHand: bestHand1,
             },
           ],
           [
             {
-              index: 1,
+              id: "2",
               bestHand: bestHand2,
             },
           ],
@@ -1915,18 +1948,21 @@ describe("Poker hand functions", () => {
         ];
         const bestHand2 = getBestHand(hand2);
 
-        const result = winners(hand1, hand2);
+        const result = winners(
+          { id: "1", cards: hand1 },
+          { id: "2", cards: hand2 }
+        );
 
         expect(result).toMatchObject([
           [
             {
-              index: 1,
+              id: "2",
               bestHand: bestHand2,
             },
           ],
           [
             {
-              index: 0,
+              id: "1",
               bestHand: bestHand1,
             },
           ],
@@ -1952,18 +1988,21 @@ describe("Poker hand functions", () => {
         ];
         const bestHand2 = getBestHand(hand2);
 
-        const result = winners(hand1, hand2);
+        const result = winners(
+          { id: "1", cards: hand1 },
+          { id: "2", cards: hand2 }
+        );
 
         expect(result).toMatchObject([
           [
             {
-              index: 0,
+              id: "1",
               bestHand: bestHand1,
             },
           ],
           [
             {
-              index: 1,
+              id: "2",
               bestHand: bestHand2,
             },
           ],
@@ -1993,18 +2032,21 @@ describe("Poker hand functions", () => {
         ];
         const bestHand2 = getBestHand(hand2);
 
-        const result = winners(hand1, hand2);
+        const result = winners(
+          { id: "1", cards: hand1 },
+          { id: "2", cards: hand2 }
+        );
 
         expect(result).toMatchObject([
           [
             {
-              index: 0,
+              id: "1",
               bestHand: bestHand1,
             },
           ],
           [
             {
-              index: 1,
+              id: "2",
               bestHand: bestHand2,
             },
           ],
@@ -2034,18 +2076,21 @@ describe("Poker hand functions", () => {
         ];
         const bestHand2 = getBestHand(hand2);
 
-        const result = winners(hand1, hand2);
+        const result = winners(
+          { id: "1", cards: hand1 },
+          { id: "2", cards: hand2 }
+        );
 
         expect(result).toMatchObject([
           [
             {
-              index: 1,
+              id: "2",
               bestHand: bestHand2,
             },
           ],
           [
             {
-              index: 0,
+              id: "1",
               bestHand: bestHand1,
             },
           ],
@@ -2075,18 +2120,21 @@ describe("Poker hand functions", () => {
         ];
         const bestHand2 = getBestHand(hand2);
 
-        const result = winners(hand1, hand2);
+        const result = winners(
+          { id: "1", cards: hand1 },
+          { id: "2", cards: hand2 }
+        );
 
         expect(result).toMatchObject([
           [
             {
-              index: 0,
+              id: "1",
               bestHand: bestHand1,
             },
           ],
           [
             {
-              index: 1,
+              id: "2",
               bestHand: bestHand2,
             },
           ],
@@ -2116,18 +2164,21 @@ describe("Poker hand functions", () => {
         ];
         const bestHand2 = getBestHand(hand2);
 
-        const result = winners(hand1, hand2);
+        const result = winners(
+          { id: "1", cards: hand1 },
+          { id: "2", cards: hand2 }
+        );
 
         expect(result).toMatchObject([
           [
             {
-              index: 0,
+              id: "1",
               bestHand: bestHand1,
             },
           ],
           [
             {
-              index: 1,
+              id: "2",
               bestHand: bestHand2,
             },
           ],
@@ -2153,18 +2204,21 @@ describe("Poker hand functions", () => {
         ];
         const bestHand2 = getBestHand(hand2);
 
-        const result = winners(hand1, hand2);
+        const result = winners(
+          { id: "1", cards: hand1 },
+          { id: "2", cards: hand2 }
+        );
 
         expect(result).toMatchObject([
           [
             {
-              index: 0,
+              id: "1",
               bestHand: bestHand1,
             },
           ],
           [
             {
-              index: 1,
+              id: "2",
               bestHand: bestHand2,
             },
           ],
@@ -2190,18 +2244,21 @@ describe("Poker hand functions", () => {
         const hand2: Cards7 = [...communityCards, c("A", "CLUB"), c(4, "CLUB")];
         const bestHand2 = getBestHand(hand2);
 
-        const result = winners(hand1, hand2);
+        const result = winners(
+          { id: "1", cards: hand1 },
+          { id: "2", cards: hand2 }
+        );
 
         expect(result).toMatchObject([
           [
             {
-              index: 1,
+              id: "2",
               bestHand: bestHand2,
             },
           ],
           [
             {
-              index: 0,
+              id: "1",
               bestHand: bestHand1,
             },
           ],
@@ -2227,18 +2284,21 @@ describe("Poker hand functions", () => {
         ];
         const bestHand2 = getBestHand(hand2);
 
-        const result = winners(hand1, hand2);
+        const result = winners(
+          { id: "1", cards: hand1 },
+          { id: "2", cards: hand2 }
+        );
 
         expect(result).toMatchObject([
           [
             {
-              index: 1,
+              id: "2",
               bestHand: bestHand2,
             },
           ],
           [
             {
-              index: 0,
+              id: "1",
               bestHand: bestHand1,
             },
           ],
@@ -2264,18 +2324,21 @@ describe("Poker hand functions", () => {
         ];
         const bestHand2 = getBestHand(hand2);
 
-        const result = winners(hand1, hand2);
+        const result = winners(
+          { id: "1", cards: hand1 },
+          { id: "2", cards: hand2 }
+        );
 
         expect(result).toMatchObject([
           [
             {
-              index: 1,
+              id: "2",
               bestHand: bestHand2,
             },
           ],
           [
             {
-              index: 0,
+              id: "1",
               bestHand: bestHand1,
             },
           ],
@@ -2301,18 +2364,21 @@ describe("Poker hand functions", () => {
         ];
         const bestHand2 = getBestHand(hand2);
 
-        const result = winners(hand1, hand2);
+        const result = winners(
+          { id: "1", cards: hand1 },
+          { id: "2", cards: hand2 }
+        );
 
         expect(result).toMatchObject([
           [
             {
-              index: 0,
+              id: "1",
               bestHand: bestHand1,
             },
           ],
           [
             {
-              index: 1,
+              id: "2",
               bestHand: bestHand2,
             },
           ],
@@ -2342,18 +2408,21 @@ describe("Poker hand functions", () => {
         ];
         const bestHand2 = getBestHand(hand2);
 
-        const result = winners(hand1, hand2);
+        const result = winners(
+          { id: "1", cards: hand1 },
+          { id: "2", cards: hand2 }
+        );
 
         expect(result).toMatchObject([
           [
             {
-              index: 0,
+              id: "1",
               bestHand: bestHand1,
             },
           ],
           [
             {
-              index: 1,
+              id: "2",
               bestHand: bestHand2,
             },
           ],
@@ -2383,18 +2452,21 @@ describe("Poker hand functions", () => {
         ];
         const bestHand2 = getBestHand(hand2);
 
-        const result = winners(hand1, hand2);
+        const result = winners(
+          { id: "1", cards: hand1 },
+          { id: "2", cards: hand2 }
+        );
 
         expect(result).toMatchObject([
           [
             {
-              index: 1,
+              id: "2",
               bestHand: bestHand2,
             },
           ],
           [
             {
-              index: 0,
+              id: "1",
               bestHand: bestHand1,
             },
           ],
@@ -2424,18 +2496,21 @@ describe("Poker hand functions", () => {
         ];
         const bestHand2 = getBestHand(hand2);
 
-        const result = winners(hand1, hand2);
+        const result = winners(
+          { id: "1", cards: hand1 },
+          { id: "2", cards: hand2 }
+        );
 
         expect(result).toMatchObject([
           [
             {
-              index: 1,
+              id: "2",
               bestHand: bestHand2,
             },
           ],
           [
             {
-              index: 0,
+              id: "1",
               bestHand: bestHand1,
             },
           ],
@@ -2465,18 +2540,21 @@ describe("Poker hand functions", () => {
         ];
         const bestHand2 = getBestHand(hand2);
 
-        const result = winners(hand1, hand2);
+        const result = winners(
+          { id: "1", cards: hand1 },
+          { id: "2", cards: hand2 }
+        );
 
         expect(result).toMatchObject([
           [
             {
-              index: 1,
+              id: "2",
               bestHand: bestHand2,
             },
           ],
           [
             {
-              index: 0,
+              id: "1",
               bestHand: bestHand1,
             },
           ],
@@ -2502,18 +2580,21 @@ describe("Poker hand functions", () => {
         ];
         const bestHand2 = getBestHand(hand2);
 
-        const result = winners(hand1, hand2);
+        const result = winners(
+          { id: "1", cards: hand1 },
+          { id: "2", cards: hand2 }
+        );
 
         expect(result).toMatchObject([
           [
             {
-              index: 1,
+              id: "2",
               bestHand: bestHand2,
             },
           ],
           [
             {
-              index: 0,
+              id: "1",
               bestHand: bestHand1,
             },
           ],
@@ -2537,16 +2618,19 @@ describe("Poker hand functions", () => {
         const hand2: Cards7 = [...communityCards, c(5, "SPADE"), c(2, "HEART")];
         const bestHand2 = getBestHand(hand2);
 
-        const result = winners(hand1, hand2);
+        const result = winners(
+          { id: "1", cards: hand1 },
+          { id: "2", cards: hand2 }
+        );
 
         expect(result).toMatchObject([
           [
             {
-              index: 0,
+              id: "1",
               bestHand: bestHand1,
             },
             {
-              index: 1,
+              id: "2",
               bestHand: bestHand2,
             },
           ],
@@ -2568,16 +2652,19 @@ describe("Poker hand functions", () => {
         const hand2: Cards7 = [...communityCards, c(5, "SPADE"), c(2, "HEART")];
         const bestHand2 = getBestHand(hand2);
 
-        const result = winners(hand1, hand2);
+        const result = winners(
+          { id: "1", cards: hand1 },
+          { id: "2", cards: hand2 }
+        );
 
         expect(result).toMatchObject([
           [
             {
-              index: 0,
+              id: "1",
               bestHand: bestHand1,
             },
             {
-              index: 1,
+              id: "2",
               bestHand: bestHand2,
             },
           ],
@@ -2603,16 +2690,19 @@ describe("Poker hand functions", () => {
         const hand2: Cards7 = [...communityCards, c(7, "SPADE"), c(2, "HEART")];
         const bestHand2 = getBestHand(hand2);
 
-        const result = winners(hand1, hand2);
+        const result = winners(
+          { id: "1", cards: hand1 },
+          { id: "2", cards: hand2 }
+        );
 
         expect(result).toMatchObject([
           [
             {
-              index: 0,
+              id: "1",
               bestHand: bestHand1,
             },
             {
-              index: 1,
+              id: "2",
               bestHand: bestHand2,
             },
           ],
@@ -2642,16 +2732,19 @@ describe("Poker hand functions", () => {
         ];
         const bestHand2 = getBestHand(hand2);
 
-        const result = winners(hand1, hand2);
+        const result = winners(
+          { id: "1", cards: hand1 },
+          { id: "2", cards: hand2 }
+        );
 
         expect(result).toMatchObject([
           [
             {
-              index: 0,
+              id: "1",
               bestHand: bestHand1,
             },
             {
-              index: 1,
+              id: "2",
               bestHand: bestHand2,
             },
           ],
@@ -2681,16 +2774,19 @@ describe("Poker hand functions", () => {
         ];
         const bestHand2 = getBestHand(hand2);
 
-        const result = winners(hand1, hand2);
+        const result = winners(
+          { id: "1", cards: hand1 },
+          { id: "2", cards: hand2 }
+        );
 
         expect(result).toMatchObject([
           [
             {
-              index: 0,
+              id: "1",
               bestHand: bestHand1,
             },
             {
-              index: 1,
+              id: "2",
               bestHand: bestHand2,
             },
           ],
@@ -2716,16 +2812,19 @@ describe("Poker hand functions", () => {
         ];
         const bestHand2 = getBestHand(hand2);
 
-        const result = winners(hand1, hand2);
+        const result = winners(
+          { id: "1", cards: hand1 },
+          { id: "2", cards: hand2 }
+        );
 
         expect(result).toMatchObject([
           [
             {
-              index: 0,
+              id: "1",
               bestHand: bestHand1,
             },
             {
-              index: 1,
+              id: "2",
               bestHand: bestHand2,
             },
           ],
@@ -2755,16 +2854,19 @@ describe("Poker hand functions", () => {
         ];
         const bestHand2 = getBestHand(hand2);
 
-        const result = winners(hand1, hand2);
+        const result = winners(
+          { id: "1", cards: hand1 },
+          { id: "2", cards: hand2 }
+        );
 
         expect(result).toMatchObject([
           [
             {
-              index: 0,
+              id: "1",
               bestHand: bestHand1,
             },
             {
-              index: 1,
+              id: "2",
               bestHand: bestHand2,
             },
           ],
@@ -2790,16 +2892,19 @@ describe("Poker hand functions", () => {
         ];
         const bestHand2 = getBestHand(hand2);
 
-        const result = winners(hand1, hand2);
+        const result = winners(
+          { id: "1", cards: hand1 },
+          { id: "2", cards: hand2 }
+        );
 
         expect(result).toMatchObject([
           [
             {
-              index: 0,
+              id: "1",
               bestHand: bestHand1,
             },
             {
-              index: 1,
+              id: "2",
               bestHand: bestHand2,
             },
           ],
@@ -2829,16 +2934,19 @@ describe("Poker hand functions", () => {
         ];
         const bestHand2 = getBestHand(hand2);
 
-        const result = winners(hand1, hand2);
+        const result = winners(
+          { id: "1", cards: hand1 },
+          { id: "2", cards: hand2 }
+        );
 
         expect(result).toMatchObject([
           [
             {
-              index: 0,
+              id: "1",
               bestHand: bestHand1,
             },
             {
-              index: 1,
+              id: "2",
               bestHand: bestHand2,
             },
           ],
@@ -2896,40 +3004,47 @@ describe("Poker hand functions", () => {
         ];
         const bestHand6 = getBestHand(hand6);
 
-        const result = winners(hand1, hand2, hand3, hand4, hand5, hand6);
+        const result = winners(
+          { id: "1", cards: hand1 },
+          { id: "2", cards: hand2 },
+          { id: "3", cards: hand3 },
+          { id: "4", cards: hand4 },
+          { id: "5", cards: hand5 },
+          { id: "6", cards: hand6 }
+        );
 
         expect(result).toMatchObject([
           [
             {
-              index: 1,
+              id: "2",
               bestHand: bestHand2,
             },
           ],
           [
             {
-              index: 2,
+              id: "3",
               bestHand: bestHand3,
             },
           ],
           [
             {
-              index: 3,
+              id: "4",
               bestHand: bestHand4,
             },
           ],
           [
             {
-              index: 0,
+              id: "1",
               bestHand: bestHand1,
             },
             {
-              index: 5,
+              id: "6",
               bestHand: bestHand6,
             },
           ],
           [
             {
-              index: 4,
+              id: "5",
               bestHand: bestHand5,
             },
           ],

@@ -24,7 +24,8 @@ import shuffle from "lodash/shuffle";
 import { Player, RoundWithHiddenInfo, Session } from "src/db/schema";
 import sortBy from "lodash/sortBy";
 import isInteger from "lodash/isInteger";
-import { max } from "lodash";
+import { cloneDeep, max } from "lodash";
+import { FeasibleCards, winners } from "src/utils/pokerHands";
 
 export const DeleteRoomAfterInactivityTimeout = 1000 * 60 * 60 * 24 * 7;
 
@@ -264,12 +265,26 @@ export const handleGameInput = ({
       ({ publicId }) => !round.foldedPlayers.includes(publicId)
     );
 
+    const communityCards = [
+      ...(round.flop ?? []),
+      round.turn,
+      round.river,
+    ].filter((card) => card != null) as ReadonlyArray<Card>;
+
     // everybody folded
     if (newSortedPlayersInRound.length == 1) {
       round.roundEnded = true;
-      round.winner = newSortedPlayersInRound[0].publicId;
-      newSortedPlayersInRound[0].chips =
-        (newSortedPlayersInRound[0].chips ?? 0) + round.pot;
+      const winner = newSortedPlayersInRound[0];
+      round.winners = winners({
+        id: winner.publicId,
+        cards: [
+          ...communityCards,
+          ...(winner.hand == null
+            ? []
+            : [winner.hand.card1, winner.hand.card2]),
+        ],
+      });
+      winner.chips = (winner.chips ?? 0) + round.pot;
       return;
     }
 
@@ -352,12 +367,42 @@ export const handleGameInput = ({
     }
 
     // all betting rounds done, finish the round
-    // TODO: Actually decide winner
     round.roundEnded = true;
-    round.winner = newSortedPlayersInRound[0].publicId;
+    round.winners = winners(
+      ...newSortedPlayersInRound.map(({ publicId, hand }) => {
+        return {
+          id: publicId,
+          cards: [
+            ...communityCards,
+            ...(hand == null ? [] : [hand.card1, hand.card2]),
+          ],
+        };
+      })
+    );
     round.bettingRound = "SHOWING_SUMMARY";
-    newSortedPlayersInRound[0].chips =
-      (newSortedPlayersInRound[0].chips ?? 0) + round.pot;
+    if (round.winners == null || round.winners.length == 0) {
+      return;
+    }
+    const chipWinners = shuffle(round.winners[0]);
+
+    let potGiven = round.pot;
+
+    chipWinners.forEach(({ id }, index) => {
+      const player = newSortedPlayersInRound.find(
+        ({ publicId }) => publicId === id
+      );
+      if (player == null) {
+        return;
+      }
+
+      const potPortion =
+        index === chipWinners.length - 1
+          ? potGiven
+          : Math.floor(round.pot / chipWinners.length);
+
+      player.chips = (player.chips ?? 0) + potPortion;
+      potGiven -= potPortion;
+    });
   };
 
   const advanceTurnOrRoundIfDone = () => {

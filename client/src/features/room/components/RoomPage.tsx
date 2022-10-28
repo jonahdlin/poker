@@ -5,6 +5,7 @@ import { useGame } from "features/room/utils/game";
 import { useMemo } from "react";
 import { DefaultProps } from "utils/styles";
 import Table from "./table/Table";
+import AdminControls from "features/room/components/adminControls/AdminControls";
 
 type RoomPageProps = DefaultProps & {
   readonly port: number;
@@ -32,8 +33,13 @@ const RoomPage: React.FC<RoomPageProps> = ({
         <Table style={styles.table} gameStore={gameStore} />
       </div>
       <div className={css(styles.footer)}>
-        <Messaging gameStore={gameStore} />
-        <PokerControls gameStore={gameStore} />
+        <div className={css(styles.footerSection)}>
+          <Messaging gameStore={gameStore} />
+          {gameStore.me?.isLeader && <AdminControls gameStore={gameStore} />}
+        </div>
+        <div className={css(styles.footerSection)}>
+          <PokerControls gameStore={gameStore} />
+        </div>
       </div>
     </div>
   );
@@ -70,10 +76,14 @@ const useStyleSheet = () => {
         footer: {
           display: "flex",
           justifyContent: "space-between",
-          alignItems: "flex-end",
           gap: 16,
           padding: 16,
           height: 132,
+        },
+        footerSection: {
+          display: "flex",
+          alignItems: "flex-end",
+          gap: 8,
         },
       }),
     []

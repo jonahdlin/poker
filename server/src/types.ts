@@ -158,6 +158,13 @@ export const isResetGame = (arg: unknown): arg is ResetGame => {
   return arg != null && typeof arg == "object" && "isTypeResetGame" in arg;
 };
 
+export type NextRound = {
+  readonly isTypeNextRound: true;
+};
+export const isNextRound = (arg: unknown): arg is NextRound => {
+  return arg != null && typeof arg == "object" && "isTypeNextRound" in arg;
+};
+
 export type RoomClientToServer =
   | SitAtTable
   | LeaveTable
@@ -167,7 +174,8 @@ export type RoomClientToServer =
   | BettingRaise
   | BettingBet
   | BettingFold
-  | ResetGame;
+  | ResetGame
+  | NextRound;
 
 export type RoomNotFound = {
   readonly isTypeRoomNotFound: true;
@@ -256,13 +264,18 @@ export type BettingRoundData = {
   >;
 };
 
+export type PlayerResult = {
+  readonly id: string; // public id
+  readonly bestHand: HandQuality<HandType>;
+};
+export type RoundWinners = ReadonlyArray<ReadonlyArray<PlayerResult>>;
 export type Round = {
   // set to false initially and then true when the round is over
   // If this round object still exists and roundEnded is true, then there is likely
   // a timer set on the BE to delete the round object. This time is for players to
   // review the results of the round before the next one starts
   readonly roundEnded: boolean;
-  readonly winner?: string; // public player ID
+  readonly winners?: RoundWinners;
 
   // cards
   readonly flop?: readonly [Card, Card, Card];

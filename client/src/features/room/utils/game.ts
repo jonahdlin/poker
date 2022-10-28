@@ -67,6 +67,7 @@ export type GameStore = {
   readonly onLeave: () => unknown;
   readonly onSendTextMessage: (message: string) => unknown;
   readonly onStartGame: () => unknown;
+  readonly onNextRound: () => unknown;
   readonly onBettingCall: () => unknown;
   readonly onBettingFold: () => unknown;
   readonly onBettingRaise: (amount: number) => unknown;
@@ -181,6 +182,16 @@ export const useGame = ({
 
     send({
       isTypeStartGame: true,
+    });
+  };
+
+  const onNextRound = () => {
+    if (!localMeState?.isLeader) {
+      return;
+    }
+
+    send({
+      isTypeNextRound: true,
     });
   };
 
@@ -351,6 +362,7 @@ export const useGame = ({
     onLeave,
     onSendTextMessage,
     onStartGame,
+    onNextRound,
 
     onBettingCall,
     onBettingFold,

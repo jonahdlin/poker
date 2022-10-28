@@ -12,6 +12,7 @@ import {
   isBettingFold,
   isBettingRaise,
   isLeaveTable,
+  isNextRound,
   isResetGame,
   isSendTextMessage,
   isSitAtTable,
@@ -99,7 +100,7 @@ export const createRoomWs = (app: Express, port: number) => {
           ? undefined
           : {
               roundEnded: round.roundEnded,
-              winner: round.winner,
+              winners: round.winners,
               flop: round.flop,
               turn: round.turn,
               river: round.river,
@@ -274,6 +275,20 @@ export const createRoomWs = (app: Express, port: number) => {
         session.gameStarted = true;
         session.round = startRound({
           players: session.players,
+          dealerPlayerId: shuffle(sortedValidPlayers)[0].publicId,
+          bigBlind: session.bigBlind,
+        });
+      } else if (isNextRound(data)) {
+        const sortedValidPlayers = sortPlayersBySeat(session.players).filter(
+          ({ chips }) => chips != null && chips > 0
+        );
+
+        if (!player.isLeader || sortedValidPlayers.length < 2) {
+          return;
+        }
+
+        session.round = startRound({
+          players: sortedValidPlayers,
           dealerPlayerId: shuffle(sortedValidPlayers)[0].publicId,
           bigBlind: session.bigBlind,
         });
