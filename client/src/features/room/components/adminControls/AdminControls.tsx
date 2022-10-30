@@ -14,7 +14,7 @@ const HoverOpenDelay = 500;
 const AdminControls: React.FC<AdminControlsProps> = ({ style, gameStore }) => {
   const styles = useStyleSheet();
 
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
 
   const { players, isGameStarted, round, onStartGame, onNextRound } = gameStore;
 
