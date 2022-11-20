@@ -4,8 +4,9 @@ import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { usePost } from "utils/api";
 
+const toaster = Toaster.create();
+
 const Home = () => {
-  const toaster = Toaster.create();
   const styles = useStyleSheet();
   const navigate = useNavigate();
 

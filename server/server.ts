@@ -11,10 +11,15 @@ const app = express();
 app.use(compression());
 app.use(helmet());
 
-const root = path.join(__dirname, "client", "build");
-app.use(express.static(root));
+app.use(function (req, res, next) {
+  res.setHeader("Content-Security-Policy", "script-src 'self'");
+  return next();
+});
+
+const clientRoot = path.join(__dirname, "..", "client", "build");
+app.use(express.static(clientRoot));
 app.get("*", (req, res) => {
-  res.sendFile("index.html", { root });
+  res.sendFile("index.html", { clientRoot });
 });
 
 createApi(app);
