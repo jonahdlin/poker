@@ -1,13 +1,13 @@
 {
-  "name": "server",
+  "name": "pokernight",
   "version": "1.0.0",
-  "description": "poker server",
+  "description": "poker app",
   "main": "index.js",
   "scripts": {
     "test": "npx jest",
     "test-watch": "npx jest --watchAll",
-    "start": "npx ts-node -r tsconfig-paths/register server.ts",
-    "start-watch": "npx nodemon -r tsconfig-paths/register server.ts",
+    "start": "npx ts-node -r tsconfig-paths/register app.ts",
+    "start-watch": "npx nodemon -r tsconfig-paths/register app.ts",
     "export-types": "copy src\\types.ts ..\\client\\src\\schema\\",
     "et": "npm run export-types",
     "sw": "npm run start-watch"
