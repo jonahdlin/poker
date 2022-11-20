@@ -1,11 +1,11 @@
-import { Button, H3, Text } from "@blueprintjs/core";
+import { Button, H3, Text, Toaster } from "@blueprintjs/core";
 import { css, StyleSheet } from "aphrodite";
-import { toaster } from "server";
 import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { usePost } from "utils/api";
 
 const Home = () => {
+  const toaster = Toaster.create();
   const styles = useStyleSheet();
   const navigate = useNavigate();
 

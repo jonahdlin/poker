@@ -9,6 +9,8 @@
     "start": "npx ts-node -r tsconfig-paths/register app.ts",
     "start-watch": "npx nodemon -r tsconfig-paths/register app.ts",
     "export-types": "copy src\\types.ts ..\\client\\src\\schema\\",
+    "build": "tsc --project .",
+    "build-prod": "cd client && npm install && npm run build && cd .. && npm install && npm run build",
     "et": "npm run export-types",
     "sw": "npm run start-watch"
   },
