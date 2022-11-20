@@ -11,6 +11,8 @@ import {
   MAX_NAME_LENGTH,
   MIN_NAME_LENGTH,
 } from "src/utils/constants";
+import express from "express";
+import path from "path";
 
 export const createApi = (app: Express) => {
   createGetEndpoint({
