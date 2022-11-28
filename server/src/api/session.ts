@@ -1,11 +1,4 @@
-import { Express } from "express";
-import http from "http";
 import {
-  BettingBet,
-  BettingCall,
-  BettingFold,
-  BettingRaise,
-  Card,
   GameState,
   isBettingBet,
   isBettingCall,
@@ -20,19 +13,17 @@ import {
   PlayerState,
   RoomClientToServer,
   RoomServerToClient,
-  TablePosition,
 } from "src/types";
 import { WebSocket, Server } from "ws";
 import url from "url";
 import { TransientMockDatabase } from "src/db/db";
 import {
   DeleteRoomAfterInactivityTimeout,
-  generateDeck,
   handleGameInput,
   sortPlayersBySeat,
   startRound,
 } from "src/utils/session";
-import { Player, RoundWithHiddenInfo, Session } from "src/db/schema";
+import { Session } from "src/db/schema";
 import {
   MESSAGE_BURST_MAX,
   MESSAGE_BURST_THRESHOLD_MILLISECONDS,
@@ -41,9 +32,8 @@ import {
 import isInteger from "lodash/isInteger";
 import shuffle from "lodash/shuffle";
 
-export const createRoomWs = (app: Express, port: number) => {
-  const server = http.createServer(app);
-  const wss = new WebSocket.Server({ server, path: `/socket` });
+export const createRoomWss = (roomId: string): Server<WebSocket> => {
+  const wss = new WebSocket.Server({ noServer: true });
   const clients: Map<
     string, // player secret ID
     WebSocket
@@ -136,6 +126,8 @@ export const createRoomWs = (app: Express, port: number) => {
     const queryObject = url.parse(req.url ?? "", true).query;
     const secretId = queryObject.secretId;
 
+    console.log(`${roomId} received connection from ${secretId}`);
+
     if (secretId == null || typeof secretId == "object") {
       send(ws, {
         isTypeMissingPlayerId: true,
@@ -143,11 +135,6 @@ export const createRoomWs = (app: Express, port: number) => {
       });
       return;
     }
-
-    const roomId = Object.keys(TransientMockDatabase.sessions).find((key) => {
-      const possibleSession = TransientMockDatabase.sessions[key];
-      return possibleSession != null && possibleSession.port == port;
-    });
 
     const session =
       roomId == null ? null : TransientMockDatabase.sessions[roomId];
@@ -323,7 +310,5 @@ export const createRoomWs = (app: Express, port: number) => {
     });
   });
 
-  server.listen(port, () => {
-    console.log(`Room ready and listening on ${port}`);
-  });
+  return wss;
 };

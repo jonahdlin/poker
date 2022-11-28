@@ -9,7 +9,6 @@ const Room: React.FC = () => {
   const styles = useStyleSheet();
 
   // set in joining stage
-  const [sessionPort, setSessionPort] = useState<number>();
   const [secretPlayerId, setSecretPlayerId] = useState<string>();
   const [publicPlayerId, setPublicPlayerId] = useState<string>();
   const [errorMessage, setErrorMessage] = useState<string>();
@@ -19,7 +18,7 @@ const Room: React.FC = () => {
   const { call: joinRoom } = usePost("/api/join-room");
 
   useEffect(() => {
-    if (sessionPort != null && secretPlayerId != null) {
+    if (secretPlayerId != null) {
       return;
     }
     const join = async () => {
@@ -34,17 +33,15 @@ const Room: React.FC = () => {
         return;
       }
 
-      setSessionPort(data.port);
       setSecretPlayerId(data.secretPlayerId);
       setPublicPlayerId(data.publicPlayerId);
     };
 
     join();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [roomId, sessionPort, secretPlayerId]);
+  }, [roomId, secretPlayerId]);
 
-  const loading =
-    errorMessage == null && (sessionPort == null || secretPlayerId == null);
+  const loading = errorMessage == null && secretPlayerId == null;
 
   if (errorMessage) {
     return (
@@ -57,7 +54,7 @@ const Room: React.FC = () => {
   }
 
   const getLoadingMessage = () => {
-    if (sessionPort == null || secretPlayerId == null) {
+    if (secretPlayerId == null) {
       return "Approaching the table";
     }
   };
@@ -72,17 +69,17 @@ const Room: React.FC = () => {
       );
     }
 
-    if (
-      sessionPort == null ||
-      secretPlayerId == null ||
-      publicPlayerId == null
-    ) {
+    if (roomId == null) {
+      return <Text>Room not found</Text>;
+    }
+
+    if (secretPlayerId == null || publicPlayerId == null) {
       return <Text>Lost connection to the room</Text>;
     }
 
     return (
       <RoomPage
-        port={sessionPort}
+        roomId={roomId}
         secretPlayerId={secretPlayerId}
         publicPlayerId={publicPlayerId}
       />

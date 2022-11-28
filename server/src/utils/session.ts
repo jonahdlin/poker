@@ -1,5 +1,3 @@
-import random from "lodash/random";
-import difference from "lodash/difference";
 import {
   uniqueNamesGenerator,
   adjectives,
@@ -24,18 +22,10 @@ import shuffle from "lodash/shuffle";
 import { Player, RoundWithHiddenInfo, Session } from "src/db/schema";
 import sortBy from "lodash/sortBy";
 import isInteger from "lodash/isInteger";
-import { cloneDeep, max } from "lodash";
-import { FeasibleCards, winners } from "src/utils/pokerHands";
+import { max } from "lodash";
+import { winners } from "src/utils/pokerHands";
 
 export const DeleteRoomAfterInactivityTimeout = 1000 * 60 * 60 * 24 * 7;
-
-export const getAvailablePort = (
-  available: ReadonlyArray<number>,
-  used: ReadonlyArray<number>
-): number => {
-  const intersection = difference(available, used);
-  return intersection[random(0, intersection.length - 1)];
-};
 
 const genName = () => {
   return uniqueNamesGenerator({

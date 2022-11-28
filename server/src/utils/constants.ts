@@ -1,4 +1,4 @@
-export const DEFAULT_BIG_BLING = 20;
+export const DEFAULT_BIG_BLIND = 20;
 export const DEFAULT_MAX_MESSAGE_LENGTH = 500;
 export const MIN_NAME_LENGTH = 2;
 export const MAX_NAME_LENGTH = 30;

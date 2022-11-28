@@ -6,6 +6,7 @@ import {
   TextMessageHistoryEntry,
 } from "src/types";
 import { Writeable } from "src/utils/types";
+import { WebSocketServer } from "ws";
 
 export type Player = {
   // secret, used to identify player when they connect or make a request
@@ -36,7 +37,8 @@ export type RoundWithHiddenInfo = Writeable<Omit<Round, "bettingRound">> & {
 
 export type Session = {
   // Session data
-  readonly port: number;
+  readonly id: string;
+  readonly wss: WebSocketServer;
   readonly name: string;
 
   // Session constants

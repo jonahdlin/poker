@@ -24,17 +24,17 @@ export type GetErrorResponse = {
   readonly data?: undefined;
 };
 
-export type GetEndpoint = "/api/get-room";
+// Example for when get endpoints are needed
+export type GetEndpoint = "/api/sample-api";
 
-export type GetEndpointIO<T extends GetEndpoint> = T extends "/api/get-room"
+export type GetEndpointIO<T extends GetEndpoint> = T extends "/api/sample-api"
   ? {
       readonly req: {
-        readonly id: string;
+        // request fields here
       };
       readonly res:
         | GetSuccessResponse<{
-            readonly name: string;
-            readonly port: number;
+            // response fields here
           }>
         | GetErrorResponse;
     }
@@ -76,7 +76,6 @@ export type PostEndpointIO<T extends PostEndpoint> =
           | PostSuccessResponse<{
               readonly secretPlayerId: string;
               readonly publicPlayerId: string;
-              readonly port: number;
             }>
           | PostErrorResponse;
       }

@@ -8,7 +8,7 @@ import {
 } from "src/types";
 
 // create application/json parser
-var JsonParser = bodyParser.json();
+const JsonParser = bodyParser.json();
 
 export const createGetEndpoint = <T extends GetEndpoint>({
   app,

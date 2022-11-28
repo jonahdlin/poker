@@ -87,11 +87,11 @@ export const AllSeats: ReadonlyArray<TablePosition> = [
 ];
 
 export const useGame = ({
-  port,
+  roomId,
   secretPlayerId,
   publicPlayerId,
 }: {
-  readonly port: number;
+  readonly roomId: string;
   readonly secretPlayerId: string;
   readonly publicPlayerId: string;
 }): GameStore => {
@@ -119,7 +119,7 @@ export const useGame = ({
       return;
     }
     const newSocket = new WebSocket(
-      `ws://localhost:${port}/socket?secretId=${secretPlayerId}`
+      `ws://${window.location.host}/socket/${roomId}?secretId=${secretPlayerId}`
     );
     newSocket.onclose = () => {
       console.log("closed socket");
@@ -133,7 +133,7 @@ export const useGame = ({
       handleReceiveMessage(data);
     setSocket(newSocket);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [port, secretPlayerId]);
+  }, [roomId, secretPlayerId]);
 
   // Sending
   const send = (data: RoomClientToServer) => {

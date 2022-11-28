@@ -11,9 +11,7 @@ import {
   getHighCard,
   getBestHand,
   winners,
-  FeasibleCards,
   Cards5,
-  Cards2,
   Cards7,
 } from "./pokerHands";
 

@@ -1,16 +1,7 @@
 /* ♣ ♦ ♥ ♠ */
-import {
-  differenceWith,
-  first,
-  flatten,
-  groupBy,
-  sortBy,
-  take,
-  takeRight,
-} from "lodash";
+import { differenceWith, first, flatten, groupBy, sortBy, take } from "lodash";
 import {
   Card,
-  Hand,
   HandQuality,
   HandType,
   PlayerResult,
@@ -570,7 +561,7 @@ export const winners = (
 ): RoundWinners => {
   const result: Array<Array<PlayerResult>> = [];
 
-  args.forEach(({ id, cards: fullHand }, index) => {
+  args.forEach(({ id, cards: fullHand }) => {
     if (!isFeasibleCards(fullHand)) {
       return;
     }

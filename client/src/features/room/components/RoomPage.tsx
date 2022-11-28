@@ -8,21 +8,21 @@ import Table from "./table/Table";
 import AdminControls from "features/room/components/adminControls/AdminControls";
 
 type RoomPageProps = DefaultProps & {
-  readonly port: number;
+  readonly roomId: string;
   readonly secretPlayerId: string;
   readonly publicPlayerId: string;
 };
 
 const RoomPage: React.FC<RoomPageProps> = ({
   style,
-  port,
+  roomId,
   secretPlayerId,
   publicPlayerId,
 }) => {
   const styles = useStyleSheet();
 
   const gameStore = useGame({
-    port,
+    roomId,
     secretPlayerId,
     publicPlayerId,
   });
