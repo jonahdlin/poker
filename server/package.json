@@ -10,7 +10,8 @@
     "start-watch": "npx nodemon -r tsconfig-paths/register server.ts",
     "export-types": "copy src\\types.ts ..\\client\\src\\schema\\",
     "build": "npx ttsc -P ./tsconfig.json",
-    "build-prod": "cd .. && cd client && npm install && npm run build && cd .. && cd server && npm install && npm run build",
+    "build-prod": "npm install && npm run build && cd ../client && npm install && npm run build && mv build ../server/dist/",
+    "build-prod:windows": "rmdir /s /q dist && npm install && npm run build && mkdir dist\\build && cd ..\\client && npm install && npm run build && xcopy /s /e build ..\\server\\dist\\build && rmdir /s /q build && cd ..\\server",
     "et": "npm run export-types",
     "sw": "npm run start-watch"
   },

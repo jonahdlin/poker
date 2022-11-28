@@ -19,7 +19,7 @@ app.use(function (req, res, next) {
   return next();
 });
 
-const clientRoot = path.join(__dirname, "..", "client", "build");
+const clientRoot = path.join(__dirname, "build");
 app.use(express.static(clientRoot));
 app.get("*", (req, res) => {
   res.sendFile("index.html", { root: clientRoot });
