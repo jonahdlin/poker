@@ -1,6 +1,0 @@
-{
-  "devDependencies": {
-    "@zerollup/ts-transform-paths": "^1.7.18",
-    "ttypescript": "^1.5.13"
-  }
-}

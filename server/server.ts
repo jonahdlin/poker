@@ -8,6 +8,9 @@ import { parse } from "url";
 import { TransientMockDatabase } from "src/db/db";
 
 const PORT = 25565;
+if (process.env.NODE_ENV === undefined) {
+  process.env.NODE_ENV = "development";
+}
 
 const app = express();
 
@@ -19,11 +22,14 @@ app.use(function (req, res, next) {
   return next();
 });
 
-const clientRoot = path.join(__dirname, "build");
-app.use(express.static(clientRoot));
-app.get("*", (req, res) => {
-  res.sendFile("index.html", { root: clientRoot });
-});
+// only serve web app if in prod
+if (process.env.NODE_ENV === "production") {
+  const clientRoot = path.join(__dirname, "build");
+  app.use(express.static(clientRoot));
+  app.get("*", (req, res) => {
+    res.sendFile("index.html", { root: clientRoot });
+  });
+}
 
 createApi(app);
 

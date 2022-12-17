@@ -1,3 +1,4 @@
+import { useEnvironmentContext } from "providers/EnvironmentProvider";
 import { useEffect, useMemo, useState } from "react";
 import {
   Hand,
@@ -100,6 +101,8 @@ export const useGame = ({
   const [localState, setLocalState] = useState<GameState>();
   const [localMeState, setLocalMeState] = useState<PlayerState>();
 
+  const { environment } = useEnvironmentContext();
+
   // Receiving
   const handleReceiveMessage = (msg: string) => {
     const data = JSON.parse(msg) as RoomServerToClient;
@@ -119,7 +122,9 @@ export const useGame = ({
       return;
     }
     const newSocket = new WebSocket(
-      `ws://${window.location.host}/socket/${roomId}?secretId=${secretPlayerId}`
+      `ws://${
+        environment === "production" ? window.location.host : "localhost:25565"
+      }/socket/${roomId}?secretId=${secretPlayerId}`
     );
     newSocket.onclose = () => {
       console.log("closed socket");
