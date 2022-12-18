@@ -1,7 +1,7 @@
 import { Button, Text } from "@blueprintjs/core";
 import { Tooltip2 } from "@blueprintjs/popover2";
 import { css, StyleSheet } from "aphrodite";
-import ChipCount from "features/room/components/controls/ChipCount";
+import ChipCount from "features/room/components/common/ChipCount";
 import WagerButton from "features/room/components/controls/WagerButton";
 import { GameStore, PokerAction } from "features/room/utils/game";
 import max from "lodash/max";

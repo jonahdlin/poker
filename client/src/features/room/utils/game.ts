@@ -20,6 +20,7 @@ export type GenericPlayer = {
   readonly name?: string;
   readonly tablePosition: TablePosition | null;
   readonly isConnected: boolean;
+  readonly isAway: boolean; // Marking away to do
   readonly textMessageTimeout?: number;
   readonly chips?: number;
   readonly secondsLeftInTurn?: number;
@@ -250,6 +251,7 @@ export const useGame = ({
     tablePosition,
     isConnected,
     chips,
+    isAway: false, // Marking away to do
   });
 
   const genericPlayers = (localState?.players ?? []).map(
@@ -327,6 +329,7 @@ export const useGame = ({
       textMessageTimeout: localMeState?.chatTimeout,
       isLeader: localMeState.isLeader,
       availableActions,
+      isAway: false, // Marking away to do
     };
   }, [myPlayer, localMeState, round]);
 

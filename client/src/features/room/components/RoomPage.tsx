@@ -6,6 +6,7 @@ import { useMemo } from "react";
 import { DefaultProps } from "utils/styles";
 import Table from "./table/Table";
 import AdminControls from "features/room/components/adminControls/AdminControls";
+import PlayerMenuButton from "./playerMenu/PlayerMenuButton";
 
 type RoomPageProps = DefaultProps & {
   readonly roomId: string;
@@ -34,6 +35,7 @@ const RoomPage: React.FC<RoomPageProps> = ({
       </div>
       <div className={css(styles.footer)}>
         <div className={css(styles.footerSection)}>
+          <PlayerMenuButton gameStore={gameStore} />
           <Messaging gameStore={gameStore} />
           {gameStore.me?.isLeader && <AdminControls gameStore={gameStore} />}
         </div>
@@ -66,7 +68,7 @@ const useStyleSheet = () => {
           padding: 48,
         },
         table: {
-          maxHeight: 1000,
+          maxHeight: 800,
           height: "100%",
           minHeight: 400,
           maxWidth: 1500,

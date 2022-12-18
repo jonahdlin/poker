@@ -57,7 +57,6 @@ const AdminControls: React.FC<AdminControlsProps> = ({ style, gameStore }) => {
   return (
     <div className={css(style)}>
       <Popover2
-        className={css(styles.popover)}
         isOpen={open}
         onClose={() => {
           setOpen(false);
@@ -148,14 +147,10 @@ const useStyleSheet = () => {
   return useMemo(
     () =>
       StyleSheet.create({
-        root: {},
         button: {
           height: 42,
           width: 42,
           borderRadius: "50%",
-        },
-        popover: {
-          marginBottom: 8,
         },
         buttonContainer: {
           position: "relative",
