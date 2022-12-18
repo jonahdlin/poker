@@ -58,6 +58,31 @@ export const createApi = (app: Express) => {
         };
       }
 
+      console.log(req.secretPlayerId);
+
+      if (req.secretPlayerId !== undefined) {
+        const player = room.players.find(
+          ({ secretId }) => secretId === req.secretPlayerId
+        );
+
+        if (player === undefined || player.isConnected) {
+          return {
+            ok: false,
+            message: "Could not find you at this table",
+          };
+        }
+
+        player.isConnected = true;
+
+        return {
+          ok: true,
+          data: {
+            secretPlayerId: player.secretId,
+            publicPlayerId: player.publicId,
+          },
+        };
+      }
+
       const secretId = uuidv4();
       const publicId = uuidv4();
 

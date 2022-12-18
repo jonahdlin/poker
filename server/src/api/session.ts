@@ -126,7 +126,7 @@ export const createRoomWss = (roomId: string): Server<WebSocket> => {
     const queryObject = url.parse(req.url ?? "", true).query;
     const secretId = queryObject.secretId;
 
-    console.log(`${roomId} received connection from ${secretId}`);
+    console.log(`${roomId}: Player connected ${secretId}`);
 
     if (secretId == null || typeof secretId == "object") {
       send(ws, {
@@ -304,6 +304,7 @@ export const createRoomWss = (roomId: string): Server<WebSocket> => {
         }, DeleteRoomAfterInactivityTimeout);
       }
 
+      console.log(`${roomId}: Player disconnected ${secretId}`);
       player.isConnected = false;
       clients.delete(player.secretId);
       pushUpdate();

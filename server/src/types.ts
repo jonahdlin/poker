@@ -71,6 +71,7 @@ export type PostEndpointIO<T extends PostEndpoint> =
     ? {
         readonly req: {
           readonly roomId: string;
+          readonly secretPlayerId?: string; // if rejoining
         };
         readonly res:
           | PostSuccessResponse<{
